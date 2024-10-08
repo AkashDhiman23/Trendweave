@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories - Admin Dashboard</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <style>
+        body {
+            display: flex;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .sidenav {
+            width: 250px;
+            height: 100%;
+            background-color: #343a40;
+            color: white;
+            padding: 25px;
+        }
+
+        .sidenav h2 {
+            color: #946c34;
+        }
+
+        .sidenav a {
+            color: white;
+            text-decoration: none;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        .sidenav a:hover {
+            background-color: #946c34;
+        }
+
+        .sidenav a i {
+            margin-right: 10px;
+        }
+
+        .sidenav li {
+            margin-bottom: 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background-color: white;
+            color: black;
+            position: relative;
+        }
+
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: white;
+            border-bottom: 1px solid #dee2e6;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-nav h4 {
+            color: #946c34;
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .content-header h5 {
+            color: #946c34;
+        }
+
+        .category-table {
+            margin-top: 20px;
+        }
+
+        .category-table th,
+        .category-table td {
+            vertical-align: middle;
+        }
+
+        .add-category-btn {
+            margin-bottom: 20px;
+        }
+
+        .subcategory-form {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="sidenav">
+        <h2>Admin Panel</h2>
+        <ul class="list-unstyled">
+            <li><a href="#"><i class="bi bi-house"></i>Dashboard</a></li>
+            <li><a href="#"><i class="bi bi-box"></i>Products</a></li>
+            <li><a href="#"><i class="bi bi-tags"></i>Categories</a></li>
+            <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
+            <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
+            <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
+            <li><a href="#"><i class="bi bi-gear"></i>Settings</a></li>
+            <li><a href="#"><i class="bi bi-door-open"></i>Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="main-content">
+        <div class="top-nav">
+            <!-- <img src="{% static 'img/LOGO.png' %}" alt="Logo" style="width: 50px; height: 50px;"> -->
+            <h4>Categories Management</h4>
+            <div class="d-flex align-items-center">
+                <span class="profile" title="Profile">
+                    <i class="bi bi-person-circle"></i> Profile
+                </span>
+                <span class="notifications" title="Notifications">
+                    <i class="bi bi-bell"></i> Notifications
+                </span>
+            </div>
+        </div>
+
+        <div class="content-header">
+            <h5>Manage Categories</h5>
+            <button class="btn btn-primary add-category-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
+        </div>
+
+        <table class="table table-striped category-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Category Name</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Men's Clothing</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Women's Clothing</td>
+                    <td>
+                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
+                        <button class="btn btn-danger btn-sm">Delete</button>
+                    </td>
+                </tr>
+                <!-- Add more categories as needed -->
+            </tbody>
+        </table>
+
+        <!-- Add New Category Modal -->
+        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="newCategoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="newCategoryName" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Add Category</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Subcategory Form -->
+        <div class="subcategory-form">
+            <h5>Add Subcategory</h5>
+            <form>
+                <div class="mb-3">
+                    <label for="categorySelect" class="form-label">Select Category</label>
+                    <select class="form-select" id="categorySelect" required>
+                        <option value="" disabled selected>Select a category</option>
+                        <option value="mens-clothing">Men's Clothing</option>
+                        <option value="womens-clothing">Women's Clothing</option>
+                        <!-- Add more categories as options here -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="subcategoryName" class="form-label">Subcategory Name</label>
+                    <input type="text" class="form-control" id="subcategoryName" required>
+                </div>
+                <button type="submit" class="btn btn-success">Add Subcategory</button>
+            </form>
+        </div>
+
+        <!-- Edit Category Modal -->
+        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="editCategoryName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" id="editCategoryName" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-primary">Save Changes</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
