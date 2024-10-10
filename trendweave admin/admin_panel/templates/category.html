@@ -104,7 +104,16 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
+        .profile a {
+            color: black; 
+            text-decoration: none; 
+        }
+
+        .profile a:hover {
+            color: #946c34; 
+        }
     </style>
+    {% load static %}
 </head>
 
 <body>
@@ -113,7 +122,7 @@
         <ul class="list-unstyled">
             <li><a href="#"><i class="bi bi-house"></i>Dashboard</a></li>
             <li><a href="#"><i class="bi bi-box"></i>Products</a></li>
-            <li><a href="#"><i class="bi bi-tags"></i>Categories</a></li>
+            <li><a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a></li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
             <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
             <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
@@ -124,11 +133,11 @@
 
     <div class="main-content">
         <div class="top-nav">
-            <!-- <img src="{% static 'img/LOGO.png' %}" alt="Logo" style="width: 50px; height: 50px;"> -->
+            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="width: 150px; height: 50px;">
             <h4>Categories Management</h4>
             <div class="d-flex align-items-center">
                 <span class="profile" title="Profile">
-                    <i class="bi bi-person-circle"></i> Profile
+                    <li><a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a></li>
                 </span>
                 <span class="notifications" title="Notifications">
                     <i class="bi bi-bell"></i> Notifications

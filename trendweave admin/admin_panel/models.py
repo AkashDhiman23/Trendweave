@@ -1,5 +1,5 @@
 import random
-from django.db import models
+from django.db import models # type: ignore
 
 class AdminRegister(models.Model):
     admin_id = models.PositiveIntegerField(unique=True, editable=False)
