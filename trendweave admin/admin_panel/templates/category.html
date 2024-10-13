@@ -104,13 +104,14 @@
             border-radius: 5px;
             background-color: #f8f9fa;
         }
+
         .profile a {
-            color: black; 
-            text-decoration: none; 
+            color: black;
+            text-decoration: none;
         }
 
         .profile a:hover {
-            color: #946c34; 
+            color: #946c34;
         }
     </style>
     {% load static %}
@@ -120,14 +121,20 @@
     <div class="sidenav">
         <h2>Admin Panel</h2>
         <ul class="list-unstyled">
-            <li><a href="#"><i class="bi bi-house"></i>Dashboard</a></li>
-            <li><a href="#"><i class="bi bi-box"></i>Products</a></li>
-            <li><a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a></li>
+            <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
+            <li><a href= "{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
+            <li>
+                <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
+                <ul class="list-unstyled subcategory-dropdown">
+                    <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
+                 
+                </ul>
+            </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
             <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
             <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
             <li><a href="#"><i class="bi bi-gear"></i>Settings</a></li>
-            <li><a href="#"><i class="bi bi-door-open"></i>Logout</a></li>
+            <li><a href="{% url 'logout' %}"><i class="bi bi-door-open"></i>Logout</a></li>
         </ul>
     </div>
 
@@ -150,79 +157,69 @@
             <button class="btn btn-primary add-category-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
         </div>
 
-        <table class="table table-striped category-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Category Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>1</td>
-                    <td>Men's Clothing</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </td>
-                </tr>
-                <tr>
-                    <td>2</td>
-                    <td>Women's Clothing</td>
-                    <td>
-                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
-                        <button class="btn btn-danger btn-sm">Delete</button>
-                    </td>
-                </tr>
-                <!-- Add more categories as needed -->
-            </tbody>
-        </table>
+       <!-- your_template.html -->
+<table class="table table-striped category-table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Category Name</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for category in categories %}
+            <tr>
+                <td>{{ forloop.counter }}</td>  <!-- This gives the current loop index -->
+                <td>{{ category.name }}</td>     <!-- Display category name -->
+                <td>
+                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
+                    <button class="btn btn-danger btn-sm">Delete</button>
+                </td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="3">No categories available.</td>  <!-- Message when there are no categories -->
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
 
-        <!-- Add New Category Modal -->
-        <div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+       <!-- Add New Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm" method="POST" action="{% url 'add_category' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="newCategoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="newCategoryName" name="category_name" required>
                     </div>
-                    <div class="modal-body">
-                        <form>
-                            <div class="mb-3">
-                                <label for="newCategoryName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="newCategoryName" required>
-                            </div>
-                        </form>
+                    <div class="mb-3">
+                        <label for="categorySlug" class="form-label">Slug <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categorySlug" name="slug" required readonly>
+                        <small class="form-text text-muted">This will be auto-generated based on the category name.</small>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Add Category</button>
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Category Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="categoryDescription" name="category_description" rows="3" required></textarea>
                     </div>
-                </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="submitAddCategoryBtn">Add Category</button>
             </div>
         </div>
+    </div>
+</div>
 
-        <!-- Subcategory Form -->
-        <div class="subcategory-form">
-            <h5>Add Subcategory</h5>
-            <form>
-                <div class="mb-3">
-                    <label for="categorySelect" class="form-label">Select Category</label>
-                    <select class="form-select" id="categorySelect" required>
-                        <option value="" disabled selected>Select a category</option>
-                        <option value="mens-clothing">Men's Clothing</option>
-                        <option value="womens-clothing">Women's Clothing</option>
-                        <!-- Add more categories as options here -->
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="subcategoryName" class="form-label">Subcategory Name</label>
-                    <input type="text" class="form-control" id="subcategoryName" required>
-                </div>
-                <button type="submit" class="btn btn-success">Add Subcategory</button>
-            </form>
-        </div>
+
+
 
         <!-- Edit Category Modal -->
         <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
@@ -233,10 +230,14 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form>
+                        <form id="editCategoryForm">
                             <div class="mb-3">
                                 <label for="editCategoryName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="editCategoryName" required>
+                                <input type="text" class="form-control" id="editCategoryName" value="Sample Category Name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="editCategoryDescription" class="form-label">Category Description</label>
+                                <textarea class="form-control" id="editCategoryDescription" rows="3">Sample Description</textarea>
                             </div>
                         </form>
                     </div>
@@ -249,8 +250,13 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('submitAddCategoryBtn').addEventListener('click', function () {
+            document.getElementById('addCategoryForm').submit();
+        });
+    </script>
 </body>
 
 </html>

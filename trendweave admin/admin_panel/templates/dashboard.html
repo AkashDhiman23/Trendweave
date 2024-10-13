@@ -122,9 +122,15 @@
     <div class="sidenav">
         <h2>Admin Panel</h2>
         <ul class="list-unstyled">
-            <li><a href="#"><i class="bi bi-house"></i>Dashboard</a></li>
-            <li><a href="#"><i class="bi bi-box"></i>Products</a></li>
-            <li><a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a></li>
+            <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
+            <li><a href= "{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
+            <li>
+                <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
+                <ul class="list-unstyled subcategory-dropdown">
+                    <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
+                 
+                </ul>
+            </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
             <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
             <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
