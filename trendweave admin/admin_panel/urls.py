@@ -13,4 +13,6 @@ urlpatterns = [
     path('add-subcategory/', views.add_subcategory, name='add_subcategory'),
     path('product/', views.product, name='product'),
     path('add_product/', views.add_product, name='add_product'),
+    path('edit_product/', views.edit_product, name='edit_product'),
+    
 ]

@@ -107,12 +107,11 @@
         <h2>Admin Panel</h2>
         <ul class="list-unstyled">
             <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
-            <li><a href= "{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
+            <li><a href="{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
             <li>
                 <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
                 <ul class="list-unstyled subcategory-dropdown">
                     <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
-                 
                 </ul>
             </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
@@ -145,10 +144,13 @@
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Image</th>
+              
                     <th>Product Name</th>
                     <th>Category</th>
                     <th>Subcategory</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -157,10 +159,13 @@
                     {% for product in product %}
                         <tr>
                             <td>{{ forloop.counter }}</td>
-                            <td><img src="#" alt="Product Image" class="product-image"></td>
+                           
                             <td>{{ product.name }}</td>
                             <td>{{ product.category.name }}</td>
                             <td>{{ product.subcategory.name }}</td>
+                            <td>{{ product.description }}</td>
+                            <td>${{ product.price }}</td>
+                            <td>{{ product.stock }}</td>
                             <td>
                                 <button class="btn btn-warning btn-sm">Edit</button>
                                 <button class="btn btn-danger btn-sm">Delete</button>
@@ -169,7 +174,7 @@
                     {% endfor %}
                 {% else %}
                     <tr>
-                        <td colspan="6">No products available.</td>
+                        <td colspan="9">No products available.</td>
                     </tr>
                 {% endif %}
             </tbody>
@@ -188,7 +193,7 @@
                     {% csrf_token %}
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="productName" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
                             <input type="text" class="form-control" id="name" name="name" required>
                         </div>
                         <div class="mb-3">
@@ -200,7 +205,7 @@
                             <input type="number" class="form-control" id="price" name="price" required>
                         </div>
                         <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <label for="stock" class="form-label">Quantity <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="stock" name="stock" required>
                         </div>
                         <div class="mb-3">
@@ -222,28 +227,138 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="productImage1" class="form-label">Product Image 1 <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="image_1" name="image_1" required>
+                            <label for="image_1" class="form-label">Product Image 1 <span class="text-danger">*</span></label>
+                            <input type="file" class="form-control" id="image_1" name="image_1" accept="image/*" required>
                         </div>
                         <div class="mb-3">
-                            <label for="productImage2" class="form-label">Product Image 2</label>
-                            <input type="file" class="form-control" id="image_2" name="image_2">
+                            <label for="image_2" class="form-label">Product Image 2</label>
+                            <input type="file" class="form-control" id="image_2" name="image_2" accept="image/*">
                         </div>
                         <div class="mb-3">
-                            <label for="productImage3" class="form-label">Product Image 3</label>
-                            <input type="file" class="form-control" id="image_3" name="image_3">
+                            <label for="image_3" class="form-label">Product Image 3</label>
+                            <input type="file" class="form-control" id="image_3" name="image_3" accept="image/*">
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Add Product</button>
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Add Product</button>
                     </div>
                 </form>
             </div>
         </div>
     </div>
 
-    
+
+
+
+
+
+
+
+    <!-- Modal for Editing Product -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{% url 'edit_product' %}" enctype="multipart/form-data" id="editProductForm">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <input type="hidden" id="edit_product_id" name="product_id" required>
+                    <div class="mb-3">
+                        <label for="edit_name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="edit_name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_description" class="form-label">Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_price" class="form-label">Price <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="edit_price" name="price" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_stock" class="form-label">Quantity <span class="text-danger">*</span></label>
+                        <input type="number" class="form-control" id="edit_stock" name="stock" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
+                        <select class="form-select" id="edit_categorySelect" name="category" required>
+                            <option value="" disabled>Select a category</option>
+                            {% for category in categories %}
+                            <option value="{{ category.pk }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>
+                        <select class="form-select" id="edit_subcategorySelect" name="subcategory" required>
+                            <option value="" disabled>Select a subcategory</option>
+                            {% for subcategory in subcategories %}
+                                <option value="{{ subcategory.pk }}">{{ subcategory.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_image_1" class="form-label">Product Image 1</label>
+                        <input type="file" class="form-control" id="edit_image_1" name="image_1" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_image_2" class="form-label">Product Image 2</label>
+                        <input type="file" class="form-control" id="edit_image_2" name="image_2" accept="image/*">
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_image_3" class="form-label">Product Image 3</label>
+                        <input type="file" class="form-control" id="edit_image_3" name="image_3" accept="image/*">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Update Product</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+    // Function to fill the edit modal with product data
+    function fillEditModal(product) {
+        document.getElementById('edit_product_id').value = product.id;
+        document.getElementById('edit_name').value = product.name;
+        document.getElementById('edit_description').value = product.description;
+        document.getElementById('edit_price').value = product.price;
+        document.getElementById('edit_stock').value = product.stock;
+        document.getElementById('edit_categorySelect').value = product.category.id;
+        document.getElementById('edit_subcategorySelect').value = product.subcategory.id;
+
+        // Show the modal
+        var editModal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        editModal.show();
+    }
+
+    // Event listeners for edit buttons
+    document.querySelectorAll('.btn-warning').forEach(function(button) {
+        button.addEventListener('click', function() {
+            // Get the product data (you should adjust this according to your actual data structure)
+            const row = this.closest('tr');
+            const product = {
+                id: row.children[0].textContent, // Assuming the first cell contains the product ID
+                name: row.children[1].textContent,
+                description: row.children[4].textContent,
+                price: row.children[5].textContent.replace('$', ''),
+                stock: row.children[6].textContent,
+                category: { id: row.children[2].textContent }, // Assuming category name is stored in the cell
+                subcategory: { id: row.children[3].textContent }, // Assuming subcategory name is stored in the cell
+            };
+            fillEditModal(product);
+        });
+    });
+
+</script>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>

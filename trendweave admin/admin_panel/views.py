@@ -1,10 +1,12 @@
 from django.http import HttpResponse, JsonResponse # type: ignore
-from django.shortcuts import render, redirect # type: ignore
+from django.shortcuts import get_object_or_404, render, redirect # type: ignore
 from .forms import AdminRegisterForm
 from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.contrib import messages # type: ignore
 from .models import AdminRegister,Category, Subcategory, Product
 from django.utils.text import slugify # type: ignore
+from django.http import JsonResponse# type: ignore
+from django.views.decorators.csrf import csrf_exempt# type: ignore
 
 
 def index(request):
@@ -87,6 +89,7 @@ def category_view(request):
     categories = Category.objects.all()
     return render(request, 'category.html', {'categories': categories})
 
+
 def add_category(request):
     if request.method == 'POST':
         # Get the category name and description from the form data
@@ -107,7 +110,7 @@ def add_category(request):
         except AdminRegister.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Admin not found.'})
 
-        # Create and save the new category instance
+        # Create and save the new category instance with the admin instance
         category = Category(
             name=category_name,
             slug=category_slug,
@@ -116,7 +119,7 @@ def add_category(request):
         )
         category.save()
 
-        
+        return JsonResponse({'status': 'success', 'message': 'Category added successfully.'})
 
     return render(request, 'category.html')
 
@@ -125,45 +128,36 @@ def add_category(request):
 
 def add_subcategory(request):
     if request.method == 'POST':
-        # Get the subcategory name, description, and category ID from the form data
+        category_id = request.POST.get('category')
         subcategory_name = request.POST.get('subcategory_name')
-        subcategory_description = request.POST.get('subcategory_description')
-        category_id = request.POST.get('category_id')  # Assuming you're getting the category ID
-
-        # Check if the subcategory with the same name already exists
-        if Subcategory.objects.filter(name=subcategory_name).exists():
-            return JsonResponse({'status': 'error', 'message': 'A subcategory with this name already exists.'})
-
-        # Get the admin instance using the admin_id from the session
+        subcategory_description = request.POST.get('subcategory_description', '')
+        
+        # Get the admin_id from the session
         admin_id = request.session.get('admin_id')
-        try:
-            admin = AdminRegister.objects.get(id=admin_id)  # Use 'id' instead of 'admin_id'
-        except AdminRegister.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Admin not found.'})
 
-        # Get the category instance to link with the subcategory
-        try:
-            # Use the id field directly for the ForeignKey
-            category = Category.objects.get(id=category_id)
-        except Category.DoesNotExist:
-            return JsonResponse({'status': 'error', 'message': 'Category not found.'})
+        # Debug: Print out the values received
+        print(f"Category ID: {category_id}, Subcategory Name: {subcategory_name}, Description: {subcategory_description}, Admin ID: {admin_id}")
 
-        # Create and save the new subcategory instance
-        subcategory = Subcategory(
+        # Retrieve the AdminRegister instance
+        admin_instance = get_object_or_404(AdminRegister, admin_id=admin_id)
+
+        # Check if the subcategory already exists
+        if Subcategory.objects.filter(name=subcategory_name).exists():
+            messages.error(request, "Subcategory with this name already exists.")
+            return redirect('subcategory_view')
+
+        # Create the subcategory
+        subcategory = Subcategory.objects.create(
+            category_id=category_id,
             name=subcategory_name,
             description=subcategory_description,
-            admin_id=admin,  # Assign the AdminRegister instance here
-            category_id=category  # Link to the selected category
+            admin_id=admin_instance  # Use the AdminRegister instance instead of admin_id
         )
-        subcategory.save()
+        messages.success(request, "Subcategory added successfully.")
+        return redirect('subcategory_view')
 
-        # Return a success response
-        return JsonResponse({'status': 'success', 'message': 'Subcategory added successfully.'})
-
-    return render(request, 'subcategory.html')
-
-
-
+    categories = Category.objects.all()
+    return render(request, 'subcategory.html', {'categories': categories})
 
 
 
@@ -177,18 +171,16 @@ def subcategory_view(request):
 
 
 
+
 def product(request):
-    # product=Product.object.all()
-    categories = Category.objects.all()
-    subcategories = Subcategory.objects.all()  # Corrected variable name for consistency
-    context = {
+    products = Product.objects.all()  # Fetch all products
+    categories = Category.objects.all()  # Fetch all categories (if needed)
+    subcategory= Subcategory.objects.all()
+    return render(request, 'product.html', {
+        'product': products,
         'categories': categories,
-        'subcategories': subcategories,
-      
-    }
-    return render(request, 'product.html', context)
-
-
+        'subcategory':subcategory,
+    })
 
 
 
@@ -207,8 +199,15 @@ def add_product(request):
         category_id = request.POST.get('category')
         subcategory_id = request.POST.get('subcategory')
 
+           # Get the admin_id from the session
+        admin_id = request.session.get('admin_id')
+
         # Debugging: Print the values received
         print(f"Category ID: {category_id}, Subcategory ID: {subcategory_id}")
+
+          # Retrieve the AdminRegister instance
+        admin_instance = get_object_or_404(AdminRegister, admin_id=admin_id)
+
 
         # Validate that category_id is not empty
         if not category_id:
@@ -228,6 +227,7 @@ def add_product(request):
             description=description,
             price=price,
             stock=stock,
+            admin_id=admin_instance,
             image_1=image_1,
             image_2=image_2,
             image_3=image_3,
@@ -241,4 +241,30 @@ def add_product(request):
     categories = Category.objects.all()
     subcategories = Subcategory.objects.all()
     return render(request, 'product.html', {'categories': categories, 'subcategories': subcategories})
+
+
+
+def edit_product(request):
+    if request.method == "POST":
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+
+        product.name = request.POST.get('name')
+        product.description = request.POST.get('description')
+        product.price = request.POST.get('price')
+        product.stock = request.POST.get('stock')
+        product.category_id = request.POST.get('category')
+        product.subcategory_id = request.POST.get('subcategory')
+
+        # Handle image uploads if necessary
+        if 'image_1' in request.FILES:
+            product.image_1 = request.FILES['image_1']
+        if 'image_2' in request.FILES:
+            product.image_2 = request.FILES['image_2']
+        if 'image_3' in request.FILES:
+            product.image_3 = request.FILES['image_3']
+
+        product.save()
+        return redirect('product.html')  # Redirect to the product list page
+    
 
