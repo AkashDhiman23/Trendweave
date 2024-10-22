@@ -5,8 +5,6 @@ from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.contrib import messages # type: ignore
 from .models import AdminRegister,Category, Subcategory, Product
 from django.utils.text import slugify # type: ignore
-from django.http import JsonResponse# type: ignore
-from django.views.decorators.csrf import csrf_exempt# type: ignore
 
 
 def index(request):
@@ -52,13 +50,39 @@ def logout_view(request):
     logout(request)  
     return redirect('index')
 
+
+
+
+
 def dashboard(request):
     # Check if the admin is logged in
     if 'admin_id' in request.session:
-        return render(request, 'dashboard.html')
+        # Fetch counts from the database
+        product_count = Product.objects.count()
+        category_count = Category.objects.count()
+        subcategory_count = Subcategory.objects.count()
+        
+        # Prepare context data to send to the template
+        context = {
+            'product_count': product_count,
+            'category_count': category_count,
+            'subcategory_count': subcategory_count,
+        }
+        
+        return render(request, 'dashboard.html', context)
     else:
         return redirect('index') 
-    
+
+
+
+
+
+
+
+
+
+
+
 
 def profile_view(request):
     # Fetch the logged-in admin's ID from the session
@@ -119,7 +143,7 @@ def add_category(request):
         )
         category.save()
 
-        return JsonResponse({'status': 'success', 'message': 'Category added successfully.'})
+        return render(request, 'category.html')
 
     return render(request, 'category.html')
 
@@ -141,11 +165,6 @@ def add_subcategory(request):
         # Retrieve the AdminRegister instance
         admin_instance = get_object_or_404(AdminRegister, admin_id=admin_id)
 
-        # Check if the subcategory already exists
-        if Subcategory.objects.filter(name=subcategory_name).exists():
-            messages.error(request, "Subcategory with this name already exists.")
-            return redirect('subcategory_view')
-
         # Create the subcategory
         subcategory = Subcategory.objects.create(
             category_id=category_id,
@@ -162,8 +181,6 @@ def add_subcategory(request):
 
 
 
-
-
 def subcategory_view(request):
     # categories = Category.objects.all()
     categories = Category.objects.all()
@@ -172,18 +189,36 @@ def subcategory_view(request):
 
 
 
+
+def delete_subcategory(request, subcategory_id):
+    # Ensure the request method is POST to prevent accidental deletions
+    if request.method == 'POST':
+        # Retrieve the subcategory instance to be deleted
+        subcategory = get_object_or_404(Subcategory, id=subcategory_id)
+
+        # Delete the subcategory
+        subcategory.delete()
+        
+        # Set a success message
+        messages.success(request, "Subcategory deleted successfully.")
+        return redirect('subcategory_view')
+
+    # If the request is not POST, redirect back to the subcategory view
+    messages.error(request, "Invalid request.")
+    return redirect('subcategory_view')
+
+
+
+
 def product(request):
     products = Product.objects.all()  # Fetch all products
     categories = Category.objects.all()  # Fetch all categories (if needed)
-    subcategory= Subcategory.objects.all()
+    subcategory = Subcategory.objects.all()  # Fetch all subcategories
     return render(request, 'product.html', {
         'product': products,
         'categories': categories,
-        'subcategory':subcategory,
+        'subcategory': subcategory,
     })
-
-
-
 
 
 
@@ -268,3 +303,94 @@ def edit_product(request):
         return redirect('product.html')  # Redirect to the product list page
     
 
+
+
+
+def edit_category(request):
+    if request.method == 'POST':
+        category_id = request.POST.get('category_id')  # Get category ID from the POST request
+        category_name = request.POST.get('category_name')
+        slug = request.POST.get('slug')
+        category_description = request.POST.get('category_description')
+
+        # Retrieve the category to be edited using the correct field name
+        category = get_object_or_404(Category, category_id=category_id)
+
+        # Update the category's details
+        category.name = category_name
+        category.slug = slug
+        category.description = category_description
+        category.save()
+
+        messages.success(request, 'Category updated successfully!')
+        return redirect('category')  # Redirect to your category list view
+
+    return redirect('category') 
+
+
+
+
+def edit_subcategory(request):
+    if request.method == 'POST':
+        subcategory_id = request.POST.get('subcategory_id')
+        subcategory_name = request.POST.get('subcategory_name')
+        subcategory_description = request.POST.get('subcategory_description')
+
+        # Retrieve the subcategory to be edited
+        subcategory = get_object_or_404(Subcategory, subcategory_id=subcategory_id)
+
+        # Update the subcategory's details
+        subcategory.name = subcategory_name
+        subcategory.description = subcategory_description
+        subcategory.save()
+
+        messages.success(request, 'Subcategory updated successfully!')
+        return redirect('subcategory_view')  # Redirect to your subcategory list view
+
+    return redirect('subcategory_view')  # Redirect if not a POST request
+
+def delete_subcategory(request):
+    if request.method == 'POST':
+        subcategory_id = request.POST.get('subcategory_id')
+
+        # Retrieve the subcategory to be deleted
+        subcategory = get_object_or_404(Subcategory, subcategory_id=subcategory_id)
+        subcategory.delete()
+
+        messages.success(request, 'Subcategory deleted successfully!')
+        return redirect('subcategory_view')  # Redirect to your subcategory list view
+
+    return redirect('subcategory_view')  # Redirect if not a POST request
+
+
+
+def delete_category(request, category_id):
+    # Change `id=category_id` to `category_id=category_id`
+    category = get_object_or_404(Category, category_id=category_id)
+    
+    if request.method == "POST":
+        category_name = category.name
+        category.delete()
+        messages.success(request, f'Category "{category_name}" was deleted successfully.')
+        return redirect('category')  # Redirect to the category management page
+
+    return render(request, 'category.html', {'categories': Category.objects.all()})
+
+
+
+
+
+
+
+
+def delete_product(request, product_id):
+    # Change `id=product_id` to `product_id=product_id`
+    product = get_object_or_404(Product, product_id=product_id)
+
+    if request.method == "POST":
+        product_name = product.name  # Capture the product name before deleting
+        product.delete()
+        messages.success(request, f'Product "{product_name}" was deleted successfully.')
+        return redirect('product')  # Redirect to the product management page
+
+    return render(request, 'product.html', {'products': Product.objects.all()})

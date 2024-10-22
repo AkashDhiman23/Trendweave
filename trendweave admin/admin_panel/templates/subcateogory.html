@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories - Admin Dashboard</title>
+    <title>Admin Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -20,14 +20,30 @@
         .sidenav {
             width: 250px;
             height: 100%;
-            background-color: #343a40;
+            background-color: black;
             color: white;
             padding: 25px;
-            position: fixed; /* Make sidenav fixed */
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidenav h2 {
-            color: #946c34;
+            display: none;
+        }
+
+        .sidenav .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidenav .logo-container img {
+            max-width: 100%;
+            height: auto;
         }
 
         .sidenav a {
@@ -37,19 +53,16 @@
             display: flex;
             align-items: center;
             transition: background 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidenav a:hover {
             background-color: #946c34;
+            color: white;
         }
 
         .sidenav a i {
             margin-right: 10px;
-        }
-
-        .sidenav li {
-            margin-bottom: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .main-content {
@@ -57,54 +70,36 @@
             padding: 20px;
             background-color: white;
             color: black;
-            margin-left: 250px; /* Adjust margin for fixed sidenav */
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .top-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             padding: 10px;
             background-color: white;
             border-bottom: 1px solid #dee2e6;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .top-nav h4 {
-            color: #946c34;
-        }
-
-        .content-header {
+        .top-nav a {
+            color: black;
+            margin-left: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            text-decoration: none;
         }
 
-        .content-header h5 {
-            color: #946c34;
+        .top-nav i {
+            font-size: 1.5rem;
+            margin-right: 5px;
         }
 
-        .category-table {
-            margin-top: 20px;
-        }
-
-        .category-table th,
-        .category-table td {
-            vertical-align: middle;
-        }
-
-        .add-category-btn {
-            margin-bottom: 20px;
-        }
-
-        .subcategory-form {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        .welcome-message {
+            font-size: 1.2em;
+            color: #333;
         }
 
         .profile a {
@@ -116,14 +111,56 @@
             color: #946c34;
         }
 
-        /* Responsive styles */
-        @media (max-width: 768px) {
-            .sidenav {
-                width: 200px;
-            }
-            .main-content {
-                margin-left: 200px;
-            }
+        .table-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .category-table {
+            width: 100%;
+            border: 2px solid black; /* Change border color to black */
+            border-collapse: collapse; /* Collapse borders */
+        }
+
+        .category-table th,
+        .category-table td {
+            border: 1px solid black; /* Set border for table cells to black */
+            text-align: center; /* Center text in cells */
+        }
+
+        .btn-add-subcategory {
+            background-color: #28a745; /* Green color for Add Subcategory button */
+            color: white; /* Text color */
+        }
+
+        .btn-edit {
+            background-color: #ffc107; /* Yellow color for Edit button */
+            color: black; /* Text color */
+        }
+
+        .btn-delete {
+            background-color: #dc3545; /* Red color for Delete button */
+            color: white; /* Text color */
+        }
+
+        .form-container {
+            background-color: #f8f9fa;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .left-right-layout {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .add-subcategory {
+            flex: 1;
+            margin-right: 20px; /* Add margin for spacing */
+        }
+
+        .table-section {
+            flex: 2; /* Make the table section wider */
         }
     </style>
     {% load static %}
@@ -131,14 +168,16 @@
 
 <body>
     <div class="sidenav">
-        <h2>Admin Panel</h2>
+        <div class="logo-container">
+            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="background-color:white;">
+        </div>
         <ul class="list-unstyled">
             <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
             <li><a href="{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
             <li>
                 <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
                 <ul class="list-unstyled subcategory-dropdown">
-                    <li><a href="">Subcategories</a></li>
+                    <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
                 </ul>
             </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
@@ -150,97 +189,170 @@
     </div>
 
     <div class="main-content">
-        <div class="top-nav">
-            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="width: 150px; height: 50px;">
-            <h4>Subcategories</h4>
+        <div class="top-nav d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><b>Subcategory Management</b></h5>
             <div class="d-flex align-items-center">
-                <span class="profile" title="Profile">
-                    <li><a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i>  Profile</a></li>
-                </span>
-                <span class="notifications" title="Notifications">
-                    <i class="bi bi-bell"></i> Notifications
-                </span>
+                <a href="{% url 'profile' %}" title="Profile" class="me-3">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href="#" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </a>
             </div>
         </div>
 
-        <div class="content-header">
-            <h5>Sub Categories</h5>
-            <!-- Uncomment if you need an add category button -->
-            <!-- <button class="btn btn-primary add-category-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button> -->
-        </div>
-
-        <table class="table table-striped category-table">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Category Name</th>
-                    <th>Subcategory Name</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% if categories %}
-                    {% for category in categories %}
-                        {% for subcategory in category.subcategories.all %}  <!-- Assuming you have a related name for subcategories -->
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>{{ category.name }}</td>
-                                <td>{{ subcategory.name }}</td>
-                                <td>
-                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
-                                    <button class="btn btn-danger btn-sm">Delete</button>
-                                </td>
-                            </tr>
+        <div class="content-header left-right-layout" style="margin-top:50px;">
+            <div class="add-subcategory form-container">
+                <h5>Add Subcategory</h5>
+                <form method="POST" action="{% url 'add_subcategory' %}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
+                        <select class="form-select" id="categorySelect" name="category" required>
+                            <option value="" disabled selected>Select a category</option>
+                            {% for category in categories %}
+                                <option value="{{ category.category_id }}">{{ category.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subcategoryName" class="form-label">Subcategory Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="subcategoryName" name="subcategory_name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="subcategoryDescription" class="form-label">Subcategory Description</label>
+                        <textarea class="form-control" id="subcategoryDescription" name="subcategory_description" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-dark">Add Subcategory</button>
+                </form>
+                {% if messages %}
+                    <div class="alert alert-danger mt-2">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
                         {% endfor %}
-                    {% endfor %}
-                {% else %}
-                    <tr>
-                        <td colspan="4" class="text-center">No categories available.</td>  <!-- Message when there are no categories -->
-                    </tr>
+                    </div>
                 {% endif %}
-            </tbody>
-        </table>
+            </div>
 
-        <div class="subcategory-form">
-            <h5>Add Subcategory</h5>
-            <form method="POST" action="{% url 'add_subcategory' %}">
-                {% csrf_token %}
-                <div class="mb-3">
-                    <label for="categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
-                    <select class="form-select" id="categorySelect" name="category" required>
-                        <option value="" disabled selected>Select a category</option>
-                        {% for category in categories %}
-                            <option value="{{ category.category_id }}">{{ category.name }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label for="subcategoryName" class="form-label">Subcategory Name <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="subcategoryName" name="subcategory_name" required>
-                </div>
-                <div class="mb-3">
-                    <label for="subcategoryDescription" class="form-label">Subcategory Description</label>
-                    <textarea class="form-control" id="subcategoryDescription" name="subcategory_description" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-success">Add Subcategory</button>
-            </form>
-            {% if messages %}
-                <div class="alert alert-success mt-2">
-                    {% for message in messages %}
-                        <p>{{ message }}</p>
-                    {% endfor %}
-                </div>
-            {% endif %}
+          
+            <div class="table-section">
+                <h5>Sub Categories</h5>
+                <table class="table table-striped category-table">
+                    <thead>
+                        <tr>
+                            <th>Subcategory ID</th>
+                            <th>Category Name</th>
+                            <th>Subcategory Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% if categories %}
+                            {% for category in categories %}
+                                {% for subcategory in category.subcategories.all %}
+                                    <tr>
+                                        <td>{{ subcategory.subcategory_id }}</td>
+                                        <td>{{ category.name }}</td>
+                                        <td>{{ subcategory.name }}</td>
+                                        <td>
+                                            <button class="btn btn-edit btn-sm" data-bs-toggle="modal" data-bs-target="#editSubcategoryModal" data-id="{{ subcategory.subcategory_id }}" data-name="{{ subcategory.name }}" data-description="{{ subcategory.description }}">Edit</button>
+                                            <button class="btn btn-delete btn-sm" data-bs-toggle="modal" data-bs-target="#deleteSubcategoryModal" data-id="{{ subcategory.subcategory_id }}" data-name="{{ subcategory.name }}">Delete</button>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        {% else %}
+                            <tr>
+                                <td colspan="4">No subcategories found.</td>
+                            </tr>
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
-    <!-- Bootstrap JS -->
+    <!-- Edit Subcategory Modal -->
+    <div class="modal fade" id="editSubcategoryModal" tabindex="-1" aria-labelledby="editSubcategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editSubcategoryModalLabel">Edit Subcategory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editSubcategoryForm" method="POST" action="{% url 'edit_subcategory' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="subcategory_id" id="editSubcategoryId">
+                        <div class="mb-3">
+                            <label for="editSubcategoryName" class="form-label">Subcategory Name</label>
+                            <input type="text" class="form-control" id="editSubcategoryName" name="subcategory_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editSubcategoryDescription" class="form-label">Subcategory Description</label>
+                            <textarea class="form-control" id="editSubcategoryDescription" name="subcategory_description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteSubcategoryModal" tabindex="-1" aria-labelledby="deleteSubcategoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteSubcategoryModalLabel">Delete Subcategory</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete the subcategory "<span id="deleteSubcategoryName"></span>"?</p>
+                </div>
+                <div class="modal-footer">
+                    <form id="deleteSubcategoryForm" method="POST" action="{% url 'delete_subcategory' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="subcategory_id" id="deleteSubcategoryId">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Optional JavaScript for additional functionality (if required)
-        // Ensure that addCategoryForm has the correct ID or adjust accordingly.
-        document.getElementById('submitAddCategoryBtn')?.addEventListener('click', function () {
-            document.getElementById('addCategoryForm')?.submit();
+        // Script to populate edit modal
+        var editModal = document.getElementById('editSubcategoryModal');
+        editModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var subcategoryId = button.getAttribute('data-id'); // Extract info from data-* attributes
+            var subcategoryName = button.getAttribute('data-name');
+            var subcategoryDescription = button.getAttribute('data-description');
+
+            var editSubcategoryId = editModal.querySelector('#editSubcategoryId');
+            var editSubcategoryName = editModal.querySelector('#editSubcategoryName');
+            var editSubcategoryDescription = editModal.querySelector('#editSubcategoryDescription');
+
+            editSubcategoryId.value = subcategoryId;
+            editSubcategoryName.value = subcategoryName;
+            editSubcategoryDescription.value = subcategoryDescription;
+        });
+
+        // Script to populate delete modal
+        var deleteModal = document.getElementById('deleteSubcategoryModal');
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var button = event.relatedTarget; // Button that triggered the modal
+            var subcategoryId = button.getAttribute('data-id'); // Extract info from data-* attributes
+            var subcategoryName = button.getAttribute('data-name');
+
+            var deleteSubcategoryId = deleteModal.querySelector('#deleteSubcategoryId');
+            var deleteSubcategoryName = deleteModal.querySelector('#deleteSubcategoryName');
+
+            deleteSubcategoryId.value = subcategoryId;
+            deleteSubcategoryName.textContent = subcategoryName;
         });
     </script>
 </body>

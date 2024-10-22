@@ -20,39 +20,45 @@
         .sidenav {
             width: 250px;
             height: 100%;
-            background-color: #343a40;
+            background-color: black;
             color: white;
-            padding: 25px; 
+            padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidenav h2 {
-            color: #946c34;
+            display: none;
+        }
+
+        .sidenav .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidenav .logo-container img {
+            max-width: 100%;
+            height: auto;
         }
 
         .sidenav a {
             color: white;
             text-decoration: none;
-            padding: 15px; 
+            padding: 15px;
             display: flex;
             align-items: center;
             transition: background 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidenav a:hover {
             background-color: #946c34;
-        }
-
-        .sidenav a i {
-            margin-right: 10px;
-        }
-
-        .sidenav a:not(:last-child) {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .sidenav li {
-            margin-bottom: 5px; 
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2); 
+            color: white;
         }
 
         .main-content {
@@ -60,35 +66,30 @@
             padding: 20px;
             background-color: white;
             color: black;
-            position: relative;
         }
 
         .top-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             padding: 10px;
             background-color: white;
             border-bottom: 1px solid #dee2e6;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .top-nav h4 {
-            color: #946c34;
-        }
-
-        .top-nav .profile,
-        .top-nav .notifications {
-            cursor: pointer;
+        .top-nav a {
+            color: black;
             margin-left: 20px;
             display: flex;
             align-items: center;
+            text-decoration: none;
         }
 
         .top-nav i {
-            font-size: 1.5rem; 
+            font-size: 1.5rem;
             margin-right: 5px;
         }
+
 
         .content-header {
             display: flex;
@@ -99,20 +100,26 @@
 
         .content-header h5 {
             color: #946c34;
+            font-size: 24px; /* Increase font size for visibility */
+            font-weight: bold; /* Bold font */
         }
 
-        .welcome-message {
-            font-size: 1.2em;
-            color: #333;
+        .card {
+            background-color: black; /* Set card color to black */
+            border: none; /* Remove border */
         }
 
-        .profile a {
-            color: black; 
-            text-decoration: none; 
+        .card-header {
+            background-color: #333; /* Darker header for contrast */
+            color: white; /* White text color */
         }
 
-        .profile a:hover {
-            color: #946c34; 
+        .card-title {
+            color: white; /* White text color for card title */
+        }
+
+        .card-text {
+            color: #ccc; /* Lighter text for description */
         }
     </style>
     {% load static %}
@@ -120,52 +127,76 @@
 
 <body>
     <div class="sidenav">
-        <h2>Admin Panel</h2>
+        <div class="logo-container">
+            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="background-color:white;">
+        </div>
         <ul class="list-unstyled">
             <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
-            <li><a href= "{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
+            <li><a href="{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
             <li>
                 <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
                 <ul class="list-unstyled subcategory-dropdown">
                     <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
-                 
                 </ul>
             </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
             <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
             <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
             <li><a href="#"><i class="bi bi-gear"></i>Settings</a></li>
-            <li><a href="{% url 'logout' %}"><i class="bi bi-door-open"></i>Logout</a></li> 
+            <li><a href="{% url 'logout' %}"><i class="bi bi-door-open"></i>Logout</a></li>
         </ul>
     </div>
 
     <div class="main-content">
-        <div class="top-nav">
-            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="width: 150px; height: auto;">
-            <h4>Admin Dashboard</h4>
+        <div class="top-nav d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><b>Dashboard</b></h5>
             <div class="d-flex align-items-center">
-                <span class="profile" title="Profile">
-                    <li><a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a></li>
-                </span>
-                <span class="notifications" title="Notifications">
-                    <i class="bi bi-bell"></i> Notifications
-                </span>
+                <a href="{% url 'profile' %}" title="Profile" class="me-3">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href="#" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </a>
             </div>
         </div>
 
-        <div class="content-header">
+        <div class="content-header" style="margin-top:30px;">
             <h5>Welcome to the Admin Dashboard</h5>
-            <button class="btn btn-primary">Add New</button>
         </div>
-        <div class="welcome-message">
-            <p>Manage your e-commerce platform effectively!</p>
-            <p>Here you can view statistics, manage orders, and oversee user accounts.</p>
-        </div>
-    </div>
 
-    <!-- Bootstrap JS (Optional) -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">Total Products</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ product_count }}</h5>
+                        <p class="card-text">Number of products available in the inventory.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">Total Categories</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ category_count }}</h5>
+                        <p class="card-text">Total categories created for products.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="card mb-3">
+                    <div class="card-header">Total Subcategories</div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{ subcategory_count }}</h5>
+                        <p class="card-text">Total subcategories created for products.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+    </div>
 </body>
 
 </html>

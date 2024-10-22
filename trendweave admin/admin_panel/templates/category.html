@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Categories - Admin Dashboard</title>
+    <title>Admin Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -20,13 +20,30 @@
         .sidenav {
             width: 250px;
             height: 100%;
-            background-color: #343a40;
+            background-color: black;
             color: white;
             padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidenav h2 {
-            color: #946c34;
+            display: none;
+        }
+
+        .sidenav .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidenav .logo-container img {
+            max-width: 100%;
+            height: auto;
         }
 
         .sidenav a {
@@ -36,19 +53,16 @@
             display: flex;
             align-items: center;
             transition: background 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidenav a:hover {
             background-color: #946c34;
+            color: white;
         }
 
         .sidenav a i {
             margin-right: 10px;
-        }
-
-        .sidenav li {
-            margin-bottom: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .main-content {
@@ -57,52 +71,43 @@
             background-color: white;
             color: black;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-container {
+            width: 100%;
+            padding: 20px;
+            background-color: #f8f9fa;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .top-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             padding: 10px;
             background-color: white;
             border-bottom: 1px solid #dee2e6;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .top-nav h4 {
-            color: #946c34;
-        }
-
-        .content-header {
+        .top-nav a {
+            color: black;
+            margin-left: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            text-decoration: none;
         }
 
-        .content-header h5 {
-            color: #946c34;
+        .top-nav i {
+            font-size: 1.5rem;
+            margin-right: 5px;
         }
 
-        .category-table {
-            margin-top: 20px;
-        }
-
-        .category-table th,
-        .category-table td {
-            vertical-align: middle;
-        }
-
-        .add-category-btn {
-            margin-bottom: 20px;
-        }
-
-        .subcategory-form {
-            margin-top: 20px;
-            padding: 15px;
-            border: 1px solid #dee2e6;
-            border-radius: 5px;
-            background-color: #f8f9fa;
+        .welcome-message {
+            font-size: 1.2em;
+            color: #333;
         }
 
         .profile a {
@@ -113,21 +118,58 @@
         .profile a:hover {
             color: #946c34;
         }
+
+        .table-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .category-table {
+            width: 100%;
+            border: 2px solid black; /* Change border color to black */
+            border-collapse: collapse; /* Collapse borders */
+        }
+
+        .category-table th,
+        .category-table td {
+            border: 1px solid black; /* Set border for table cells to black */
+            text-align: center; /* Center text in cells */
+        }
+
+        .btn-edit {
+            background-color: #946c34; /* Edit button color */
+            color: white; /* Text color */
+        }
+
+        .btn-delete {
+            background-color: black; /* Delete button color */
+            color: white; /* Text color */
+        }
+        .btn-black {
+    background-color: black; /* Black background */
+    color: white; /* White text color */
+    border: none; /* No border */
+}
+
+.btn-black:hover {
+    background-color: darkgray; /* Dark gray on hover */
+}
     </style>
     {% load static %}
 </head>
 
 <body>
     <div class="sidenav">
-        <h2>Admin Panel</h2>
+        <div class="logo-container">
+            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="background-color:white;">
+        </div>
         <ul class="list-unstyled">
             <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
-            <li><a href= "{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
+            <li><a href="{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
             <li>
                 <a href="{% url 'category' %}"><i class="bi bi-tags"></i>Categories</a>
                 <ul class="list-unstyled subcategory-dropdown">
                     <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
-                 
                 </ul>
             </li>
             <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
@@ -139,124 +181,192 @@
     </div>
 
     <div class="main-content">
-        <div class="top-nav">
-            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="width: 150px; height: 50px;">
-            <h4>Categories Management</h4>
-            <div class="d-flex align-items-center">
-                <span class="profile" title="Profile">
-                    <li><a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a></li>
-                </span>
-                <span class="notifications" title="Notifications">
-                    <i class="bi bi-bell"></i> Notifications
-                </span>
+        <div class="top-nav d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><b>Category Management</b></h5> <!-- Add the heading here -->
+            <div class="d-flex align-items-center"> <!-- Added d-flex for the icons -->
+                <a href="{% url 'profile' %}" title="Profile" class="me-3">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href="#" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </a>
             </div>
         </div>
 
-        <div class="content-header">
-            <h5>Manage Categories</h5>
-            <button class="btn btn-primary add-category-btn" data-bs-toggle="modal" data-bs-target="#addCategoryModal">Add New Category</button>
+        <div class="row flex-fill" style="margin-top:50px;">
+            <div class="col-md-4">
+                <div class="form-container">
+                    <h5><b>Add New Category</b></h5> <!-- Make the heading bold -->
+                    <form id="addCategoryForm" method="POST" action="{% url 'add_category' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="newCategoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="newCategoryName" name="category_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categorySlug" class="form-label">Slug <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="categorySlug" name="slug" required readonly>
+                            <small class="form-text text-muted">This will be auto-generated based on the category name.</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDescription" class="form-label">Category Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="categoryDescription" name="category_description" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-dark">Add Category</button> <!-- Button color set to black -->
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-md-8 table-container">
+                <h5><b>Manage Categories</b></h5> <!-- Make the heading bold -->
+                <table class="table table-striped category-table">
+                    <thead>
+                        <tr>
+                            <th>Category ID</th>
+                            <th>Category Name</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.category_id }}</td>
+                                <td>{{ category.name }}</td>
+                                <td>
+                                    <div class="d-flex justify-content-center"> <!-- Flexbox container for alignment -->
+                                        <button class="btn btn-edit btn-sm me-2" data-bs-toggle="modal" data-bs-target="#editCategoryModal" 
+                                        data-category-id="{{ category.category_id}}"
+                                        data-category-name="{{ category.name }}"
+                                        data-category-slug="{{ category.slug }}"
+                                        data-category-description="{{ category.description }}">
+                                        Edit
+                                    </button>
+
+                                        {% if category.category_id %}
+                                        <form action="{% url 'delete_category' category.category_id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-black">Delete</button>
+                                        </form>
+                                        {% else %}
+                                        <p>Cannot delete this category.</p>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">No categories available.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
+    </div>
 
-       <!-- your_template.html -->
-<table class="table table-striped category-table">
-    <thead>
-        <tr>
-            <th>#</th>
-            <th>Category Name</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for category in categories %}
-            <tr>
-                <td>{{ forloop.counter }}</td>  <!-- This gives the current loop index -->
-                <td>{{ category.name }}</td>     <!-- Display category name -->
-                <td>
-                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCategoryModal">Edit</button>
-                    <button class="btn btn-danger btn-sm">Delete</button>
-                </td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3">No categories available.</td>  <!-- Message when there are no categories -->
-            </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
-       <!-- Add New Category Modal -->
-<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+
+
+
+    <!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="addCategoryModalLabel">Add New Category</h5>
+                <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <form id="addCategoryForm" method="POST" action="{% url 'add_category' %}">
+                <form id="editCategoryForm" method="POST" action="{% url 'edit_category' %}">
                     {% csrf_token %}
+                    <input type="hidden" id="editCategoryId" name="category_id">
                     <div class="mb-3">
-                        <label for="newCategoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="newCategoryName" name="category_name" required>
+                        <label for="editCategoryName" class="form-label">Category Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editCategoryName" name="category_name" required>
                     </div>
                     <div class="mb-3">
-                        <label for="categorySlug" class="form-label">Slug <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="categorySlug" name="slug" required readonly>
-                        <small class="form-text text-muted">This will be auto-generated based on the category name.</small>
+                        <label for="editCategorySlug" class="form-label">Slug <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="editCategorySlug" name="slug" required>
                     </div>
                     <div class="mb-3">
-                        <label for="categoryDescription" class="form-label">Category Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="categoryDescription" name="category_description" rows="3" required></textarea>
+                        <label for="editCategoryDescription" class="form-label">Category Description <span class="text-danger">*</span></label>
+                        <textarea class="form-control" id="editCategoryDescription" name="category_description" rows="3" required></textarea>
                     </div>
+                    <button type="submit" class="btn btn-dark">Save Changes</button>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="submitAddCategoryBtn">Add Category</button>
             </div>
         </div>
     </div>
 </div>
 
-
-
-
-        <!-- Edit Category Modal -->
-        <div class="modal fade" id="editCategoryModal" tabindex="-1" aria-labelledby="editCategoryModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editCategoryModalLabel">Edit Category</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editCategoryForm">
-                            <div class="mb-3">
-                                <label for="editCategoryName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" id="editCategoryName" value="Sample Category Name">
-                            </div>
-                            <div class="mb-3">
-                                <label for="editCategoryDescription" class="form-label">Category Description</label>
-                                <textarea class="form-control" id="editCategoryDescription" rows="3">Sample Description</textarea>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save Changes</button>
-                    </div>
-                </div>
+    <!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteCategoryModal" tabindex="-1" aria-labelledby="deleteCategoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteCategoryModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the category <span id="category-name"></span>?</p>
+            </div>
+            <div class="modal-footer">
+                <form method="POST" id="deleteCategoryForm">
+                    {% csrf_token %}
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+                </form>
             </div>
         </div>
     </div>
+</div>
+    <script>
+          // Edit Category Modal
+    const editCategoryModal = document.getElementById('editCategoryModal');
+    editCategoryModal.addEventListener('show.bs.modal', (event) => {
+        const button = event.relatedTarget; // Button that triggered the modal
+        const categoryId = button.getAttribute('data-category-id');
+        const categoryName = button.getAttribute('data-category-name');
+        const categorySlug = button.getAttribute('data-category-slug');
+        const categoryDescription = button.getAttribute('data-category-description');
+
+        // Update the modal's content
+        const modalTitle = editCategoryModal.querySelector('.modal-title');
+        const modalBodyInput = editCategoryModal.querySelector('#editCategoryId');
+        const modalBodyName = editCategoryModal.querySelector('#editCategoryName');
+        const modalBodySlug = editCategoryModal.querySelector('#editCategorySlug');
+        const modalBodyDescription = editCategoryModal.querySelector('#editCategoryDescription');
+
+        modalTitle.textContent = 'Edit Category';
+        modalBodyInput.value = categoryId;
+        modalBodyName.value = categoryName;
+        modalBodySlug.value = categorySlug;
+        modalBodyDescription.value = categoryDescription;
+    });
+
+    var deleteCategoryModal = document.getElementById('deleteCategoryModal');
+    deleteCategoryModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;  // Button that triggered the modal
+        var categoryId = button.getAttribute('data-category-id');  // Extract category ID from data-* attributes
+        var categoryName = button.getAttribute('data-category-name');  // Extract category name
+        
+        // Update modal content with category name
+        var categoryNameElement = deleteCategoryModal.querySelector('#category-name');
+        categoryNameElement.textContent = categoryName;
+
+        // Update the form action dynamically
+        var form = deleteCategoryModal.querySelector('#deleteCategoryForm');
+        form.action = "{% url 'delete_category' 0 %}".replace("0", categoryId); // This works, but ensure that your delete URL pattern expects an integer ID
+
+    });
+
+
+</script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        document.getElementById('submitAddCategoryBtn').addEventListener('click', function () {
-            document.getElementById('addCategoryForm').submit();
-        });
-    </script>
+   
 </body>
 
 </html>

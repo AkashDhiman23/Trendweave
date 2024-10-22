@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Products - Admin Dashboard</title>
+    <title>Admin Dashboard</title>
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -20,13 +20,30 @@
         .sidenav {
             width: 250px;
             height: 100%;
-            background-color: #343a40;
+            background-color: black;
             color: white;
             padding: 25px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidenav h2 {
-            color: #946c34;
+            display: none;
+        }
+
+        .sidenav .logo-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 2px solid white;
+            padding: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .sidenav .logo-container img {
+            max-width: 100%;
+            height: auto;
         }
 
         .sidenav a {
@@ -36,19 +53,16 @@
             display: flex;
             align-items: center;
             transition: background 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .sidenav a:hover {
             background-color: #946c34;
+            color: white;
         }
 
         .sidenav a i {
             margin-right: 10px;
-        }
-
-        .sidenav li {
-            margin-bottom: 5px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .main-content {
@@ -57,54 +71,98 @@
             background-color: white;
             color: black;
             position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-container {
+            width: 100%;
+            padding: 20px;
+            background-color: #f8f9fa;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
         }
 
         .top-nav {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            justify-content: flex-end;
             padding: 10px;
             background-color: white;
             border-bottom: 1px solid #dee2e6;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        .top-nav h4 {
-            color: #946c34;
-        }
-
-        .content-header {
+        .top-nav a {
+            color: black;
+            margin-left: 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            text-decoration: none;
         }
 
-        .content-header h5 {
+        .top-nav i {
+            font-size: 1.5rem;
+            margin-right: 5px;
+        }
+
+        .welcome-message {
+            font-size: 1.2em;
+            color: #333;
+        }
+
+        .profile a {
+            color: black;
+            text-decoration: none;
+        }
+
+        .profile a:hover {
             color: #946c34;
         }
 
-        .product-table {
-            margin-top: 20px;
+        .table-container {
+            flex: 1;
+            padding: 20px;
         }
 
-        .product-table th,
-        .product-table td {
-            vertical-align: middle;
+        .category-table {
+            width: 100%;
+            border: 2px solid black; /* Change border color to black */
+            border-collapse: collapse; /* Collapse borders */
         }
 
-        .product-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
+        .category-table th,
+        .category-table td {
+            border: 1px solid black; /* Set border for table cells to black */
+            text-align: center; /* Center text in cells */
         }
+
+        .btn-edit {
+            background-color: #946c34; /* Edit button color */
+            color: white; /* Text color */
+        }
+
+        .btn-delete {
+            background-color: black; /* Delete button color */
+            color: white; /* Text color */
+        }
+        .btn-black {
+    background-color: black; /* Black background */
+    color: white; /* White text color */
+    border: none; /* No border */
+}
+
+.btn-black:hover {
+    background-color: darkgray; /* Dark gray on hover */
+}
     </style>
     {% load static %}
 </head>
 
 <body>
     <div class="sidenav">
-        <h2>Admin Panel</h2>
+        <div class="logo-container">
+            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="background-color:white;">
+        </div>
         <ul class="list-unstyled">
             <li><a href="{% url 'dashboard' %}"><i class="bi bi-house"></i>Dashboard</a></li>
             <li><a href="{% url 'product' %}"><i class="bi bi-box"></i>Products</a></li>
@@ -123,27 +181,28 @@
     </div>
 
     <div class="main-content">
-        <div class="top-nav">
-            <img src="{% static 'adminpanel/img/LOGO_black.png' %}" alt="Logo" style="width: 150px; height: 50px;">
-            <div class="d-flex align-items-center">
-                <span class="profile" title="Profile">
-                    <li><a href="{% url 'profile' %}"><i class="bi bi-person-circle"></i> Profile</a></li>
-                </span>
-                <span class="notifications" title="Notifications">
-                    <i class="bi bi-bell"></i> Notifications
-                </span>
+        <div class="top-nav d-flex justify-content-between align-items-center">
+            <h5 class="mb-0"><b>Product Management</b></h5> <!-- Add the heading here -->
+            <div class="d-flex align-items-center"> <!-- Added d-flex for the icons -->
+                <a href="{% url 'profile' %}" title="Profile" class="me-3">
+                    <i class="bi bi-person-circle"></i>
+                </a>
+                <a href="#" title="Notifications">
+                    <i class="bi bi-bell"></i>
+                </a>
             </div>
         </div>
 
-        <div class="content-header">
-            <h5>Products</h5>
-            <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">Add Product</button>
+        <div class="content-header" style="margin-top: 20px;">
+            <div class="d-flex justify-content-end mb-3">
+                <button class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#addProductModal" style="font-weight: bold; width:200px; padding:10px;">Add New Product</button>
+            </div>
         </div>
 
-        <table class="table table-striped product-table">
+        <table class="table table-striped category-table" style="margin-top:30px;">
             <thead>
                 <tr>
-                    <th>#</th>
+                    <th>Product ID </th>
               
                     <th>Product Name</th>
                     <th>Category</th>
@@ -158,7 +217,7 @@
                 {% if product %}
                     {% for product in product %}
                         <tr>
-                            <td>{{ forloop.counter }}</td>
+                            <td>{{ product.product_id }}</td>
                            
                             <td>{{ product.name }}</td>
                             <td>{{ product.category.name }}</td>
@@ -167,8 +226,17 @@
                             <td>${{ product.price }}</td>
                             <td>{{ product.stock }}</td>
                             <td>
+                                <div class="d-flex justify-content-center"> 
                                 <button class="btn btn-warning btn-sm">Edit</button>
-                                <button class="btn btn-danger btn-sm">Delete</button>
+                                {% if product.product_id %}
+                                        <form action="{% url 'delete_product' product.product_id %}" method="post">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn btn-black">Delete</button>
+                                        </form>
+                                        {% else %}
+                                        <p>Cannot delete this category.</p>
+                                        {% endif %}
+                                        </div>
                             </td>
                         </tr>
                     {% endfor %}
@@ -192,51 +260,65 @@
                 <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
-                            <input type="text" class="form-control" id="name" name="name" required>
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="price" name="price" required>
+                            </div>
                         </div>
+                
                         <div class="mb-3">
                             <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                         </div>
-                        <div class="mb-3">
-                            <label for="price" class="form-label">Price <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="price" name="price" required>
+                
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="stock" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="stock" name="stock" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
+                                <select class="form-select" id="categorySelect" name="category" required>
+                                    <option value="" disabled selected>Select a category</option>
+                                    {% for category in categories %}
+                                    <option value="{{ category.pk }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="stock" class="form-label">Quantity <span class="text-danger">*</span></label>
-                            <input type="number" class="form-control" id="stock" name="stock" required>
+                
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>
+                                <select class="form-select" id="subcategorySelect" name="subcategory" required>
+                                    <option value="" disabled selected>Select a Subcategory</option>
+                                    {% for sub in subcategory %}
+                                        <option value="{{ sub.pk }}">{{ sub.name }}</option>
+                                    {% empty %}
+                                        <option value="">No subcategories available</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="image_1" class="form-label">Product Image 1 <span class="text-danger">*</span></label>
+                                <input type="file" class="form-control" id="image_1" name="image_1" accept="image/*" required>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
-                            <select class="form-select" id="categorySelect" name="category" required>
-                                <option value="" disabled selected>Select a category</option>
-                                {% for category in categories %}
-                                <option value="{{ category.pk }}">{{ category.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>
-                            <select class="form-select" id="subcategorySelect" name="subcategory" required>
-                                <option value="" disabled selected>Select a subcategory</option>
-                                {% for subcategory in subcategories %}
-                                    <option value="{{ subcategory.pk }}">{{ subcategory.name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="image_1" class="form-label">Product Image 1 <span class="text-danger">*</span></label>
-                            <input type="file" class="form-control" id="image_1" name="image_1" accept="image/*" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="image_2" class="form-label">Product Image 2</label>
-                            <input type="file" class="form-control" id="image_2" name="image_2" accept="image/*">
-                        </div>
-                        <div class="mb-3">
-                            <label for="image_3" class="form-label">Product Image 3</label>
-                            <input type="file" class="form-control" id="image_3" name="image_3" accept="image/*">
+                
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="image_2" class="form-label">Product Image 2</label>
+                                <input type="file" class="form-control" id="image_2" name="image_2" accept="image/*">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="image_3" class="form-label">Product Image 3</label>
+                                <input type="file" class="form-control" id="image_3" name="image_3" accept="image/*">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -247,15 +329,7 @@
             </div>
         </div>
     </div>
-
-
-
-
-
-
-
-
-    <!-- Modal for Editing Product -->
+<!-- Modal for Editing Product -->
 <div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -267,22 +341,30 @@
                 {% csrf_token %}
                 <div class="modal-body">
                     <input type="hidden" id="edit_product_id" name="product_id" required>
-                    <div class="mb-3">
-                        <label for="edit_name" class="form-label">Product Name <span class="text-danger">*</span></label>
-                        <input type="text" class="form-control" id="edit_name" name="name" required>
+
+                    <!-- Row for Two Columns -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_name" class="form-label">Product Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="edit_name" name="name" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_price" class="form-label">Price <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="edit_price" name="price" required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="edit_description" class="form-label">Description <span class="text-danger">*</span></label>
-                        <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="edit_description" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="edit_stock" class="form-label">Quantity <span class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="edit_stock" name="stock" required>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="edit_price" class="form-label">Price <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="edit_price" name="price" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_stock" class="form-label">Quantity <span class="text-danger">*</span></label>
-                        <input type="number" class="form-control" id="edit_stock" name="stock" required>
-                    </div>
+
                     <div class="mb-3">
                         <label for="edit_categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
                         <select class="form-select" id="edit_categorySelect" name="category" required>
@@ -292,6 +374,7 @@
                             {% endfor %}
                         </select>
                     </div>
+
                     <div class="mb-3">
                         <label for="edit_subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>
                         <select class="form-select" id="edit_subcategorySelect" name="subcategory" required>
@@ -301,17 +384,21 @@
                             {% endfor %}
                         </select>
                     </div>
-                    <div class="mb-3">
-                        <label for="edit_image_1" class="form-label">Product Image 1</label>
-                        <input type="file" class="form-control" id="edit_image_1" name="image_1" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_image_2" class="form-label">Product Image 2</label>
-                        <input type="file" class="form-control" id="edit_image_2" name="image_2" accept="image/*">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_image_3" class="form-label">Product Image 3</label>
-                        <input type="file" class="form-control" id="edit_image_3" name="image_3" accept="image/*">
+
+                    <!-- Image Uploads -->
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="edit_image_1" class="form-label">Product Image 1</label>
+                            <input type="file" class="form-control" id="edit_image_1" name="image_1" accept="image/*">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="edit_image_2" class="form-label">Product Image 2</label>
+                            <input type="file" class="form-control" id="edit_image_2" name="image_2" accept="image/*">
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="edit_image_3" class="form-label">Product Image 3</label>
+                            <input type="file" class="form-control" id="edit_image_3" name="image_3" accept="image/*">
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -324,7 +411,7 @@
 </div>
 
 
-    <script>
+<script>
     // Function to fill the edit modal with product data
     function fillEditModal(product) {
         document.getElementById('edit_product_id').value = product.id;
@@ -357,10 +444,8 @@
             fillEditModal(product);
         });
     });
-
 </script>
-    <!-- Bootstrap JS -->
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 </html>
