@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <!-- Bootstrap CSS -->
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <style>
+        .sidenav {
+            height: 100%;
+            width: 30%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .sidenav .login-main-text {
+            padding: 40px;
+            color: #495057;
+        }
+        .main {
+            margin-left: 30%;
+            padding: 20px;
+        }
+        .login-form {
+            max-width: 400px;
+            margin: auto;
+        }
+        .btn-black {
+            background-color: #343a40;
+            color: white;
+        }
+        .btn-black:hover {
+            background-color: #23272b;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .error-message {
+            color: red;
+            margin-bottom: 10px;
+        }
+        .btn-back {            
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+        .forgot-password {
+            display: block;
+            margin-top: 10px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidenav">
+        <div class="login-main-text">
+            <h2>TrendWeave <br> Login Page</h2>
+            <p>Login or register from here to access.</p>
+        </div>
+    </div>
+    <div class="main">
+        <div class="col-md-6 col-sm-12">
+            <div class="login-form">
+                <form method="post" action="{% url 'users:login' %}">
+                    {% csrf_token %}
+                    {% if error_message %}
+                        <div class="error-message">{{ error_message }}</div>
+                    {% endif %}
+                    <div class="form-group">
+                        <label for="username">User Name</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="User Name" required>
+                        {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        {% if form.password.errors %}
+                            <div class="text-danger">{{ form.password.errors }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-black">Login</button>
+                    <a href="{% url 'users:register' %}" class="btn btn-secondary">Register</a>
+                    <a href="javascript:history.back()" class="btn btn-back">Back</a>
+                    <a href="{% url 'users:forgot_password' %}" class="forgot-password">Forgot Password?</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Userpanel',
 ]
 
 MIDDLEWARE = [
@@ -83,7 +84,11 @@ DATABASES = {
         'PORT': '5432',                 
     }
 }
-
+# settings.py
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'Userpanel/static',  
+]
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -125,3 +130,13 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.office365.com'  # For Office 365
+EMAIL_PORT = 587  # Use 587 for TLS
+EMAIL_USE_TLS = True  # Set to True for TLS
+EMAIL_HOST_USER = 'trendweavenz@outlook.com'  
+EMAIL_HOST_PASSWORD = 'trendweave@123'  
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+

@@ -1,0 +1,110 @@
+/* General Styles */
+body {
+  font-family: 'Arial', sans-serif;
+}
+
+/* Header Styles */
+.navbar {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.nav__logo {
+  height: 50px; /* Adjust as necessary */
+}
+
+/* Home Section */
+#home {
+  background: url("{% static 'userpanel/img/Jumbo.jpg' %}") no-repeat center center/cover;
+  color: #fff;
+
+}
+
+#home h1 {
+  font-weight: bold;
+  font-size: 3rem;
+}
+
+#home span {
+  color: #ffc107; /* Gold color for emphasis */
+}
+
+/* Collection Section */
+.card {
+  border-radius: 10px;
+}
+
+.card-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Featured Products Section */
+.section-title {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+/* Offer Section */
+.offer__title {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+/* Newsletter Section */
+#subscribed {
+  background-color: #f8f9fa;
+}
+
+#subscribed h2 {
+  margin-bottom: 20px;
+}
+
+/* Footer Styles */
+footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+footer h5 {
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+footer a {
+  transition: color 0.3s;
+}
+
+footer a:hover {
+  color: #ffc107; /* Gold color for hover effect */
+}
+
+/* Button Styles */
+.btn-outline-dark {
+  border: 2px solid #343a40; /* Dark outline */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-dark:hover {
+  background-color: #343a40; /* Dark background on hover */
+  color: #fff; /* White text on hover */
+}
+
+.btn-outline-light {
+  border: 2px solid #fff; /* White outline */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.btn-outline-light:hover {
+  background-color: #fff; /* White background on hover */
+  color: #343a40; /* Dark text on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 900px) {
+  #home h1 {
+      font-size: 2rem; /* Smaller font size for mobile */
+  }
+
+  .card-title {
+      font-size: 1.25rem; /* Smaller card title for mobile */
+  }
+}

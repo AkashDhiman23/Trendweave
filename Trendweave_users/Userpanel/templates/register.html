@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <style>
+        .sidenav {
+            height: 100%;
+            width: 30%; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            background-color: #f8f9fa;
+            padding: 20px;
+        }
+        .sidenav .login-main-text {
+            padding: 40px; 
+            color: #495057;
+        }
+        .main {
+            margin-left: 30%; 
+            padding: 20px;
+        }
+        .login-form {
+            max-width: 400px; 
+            margin: auto;
+        }
+        .btn-black {
+            background-color: #343a40;
+            color: white;
+        }
+        .btn-black:hover {
+            background-color: #23272b;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .btn-back {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="sidenav">
+        <div class="login-main-text">
+            <h2>Trendweave<br> Register Page</h2>
+            <p>Register here to create an account.</p>
+        </div>
+    </div>
+    <div class="main">
+        <div class="col-md-6 col-sm-12">
+            <div class="login-form">
+                <form method="post" action="{% url 'register' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="username">User Name</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="User Name" required>
+                        {% if form.username.errors %}
+                            <div class="text-danger">{{ form.username.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Email" required>
+                        {% if form.email.errors %}
+                            <div class="text-danger">{{ form.email.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="password1">Password</label>
+                        <input type="password" class="form-control" id="password1" name="password1" placeholder="Password" required>
+                        {% if form.password1.errors %}
+                            <div class="text-danger">{{ form.password1.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="password2">Confirm Password</label>
+                        <input type="password" class="form-control" id="password2" name="password2" placeholder="Confirm Password" required>
+                        {% if form.password2.errors %}
+                            <div class="text-danger">{{ form.password2.errors.as_text }}</div>
+                        {% endif %}
+                    </div>
+                    <button type="submit" class="btn btn-black">Register</button>
+                    <a href="" class="btn btn-secondary">Login</a>
+                    <a href="javascript:history.back()" class="btn btn-back">Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</body>
+</html>
