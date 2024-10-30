@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Boxicons -->
+    <link href="https://cdn.jsdelivr.net/npm/boxicons@2.0.5/css/boxicons.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'userpanel/css/styles.css' %}">
+
+    <title>Fashion Store Website</title>
+   
+</head>
+{% load static %}
+<body>
+    <!-- HEADER -->
+    <header class="bg-light py-3">
+        <nav class="navbar navbar-expand-lg navbar-dark ">
+            <a href="#" class="navbar-brand">
+                <img src="{% static 'userpanel/img/LOGO_black.png' %}" class="nav__logo" alt="Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item"><a href="#home" class="nav-link active">Home</a></li>
+                    <li class="nav-item"><a href="#featured" class="nav-link">Featured</a></li>
+                   
+                    <li class="nav-item"><a href="/login" class="nav-link">Login</a></li>
+                    <li class="nav-item"><a href="/register" class="nav-link">Register</a></li>
+                    <li class="nav-item"><a href="#" class="nav-link"><i class="bx bx-cart"></i> Cart</a></li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- HOME -->
+        <section class="container-fluid bg-light" id="home">
+            <div class="row align-items-center min-vh-100">
+                <div class="col-lg-6 text-center text-lg-left">
+                    <h1 class="display-4">NEW <br><span>ARRIVALS</span></h1>
+                    <a href="#featured" class="btn btn-primary btn-lg">GO SHOPPING</a>
+                </div>
+                <div class="col-lg-6">
+                    <img src="{% static 'userpanel/img/Jumbo.jpg' %}" class="img-fluid" alt="Home">
+                </div>
+            </div>
+        </section>
+
+        <!-- COLLECTION -->
+        <section class="container my-5">
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0">
+                        <img src="{% static 'userpanel/img/backpackMan.png' %}" class="card-img-top" alt="Men Backpack">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Men Backpack</h3>
+                            <a href="#" class="btn btn-outline-dark">View collection</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-4">
+                    <div class="card border-0">
+                        <img src="{% static 'userpanel/img/backpackWoman.png' %}" class="card-img-top" alt="Women Backpack">
+                        <div class="card-body text-center">
+                            <h3 class="card-title">Women Backpack</h3>
+                            <a href="#" class="btn btn-outline-dark">View collection</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FEATURED PRODUCTS -->
+        <section class="container my-5" id="featured">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title">FEATURED PRODUCTS</h2>
+                <a href="#" class="btn btn-link">View All</a>
+            </div>
+            <div class="row">
+                {% for product in products %}
+                <div class="col-md-3 mb-4">
+                    <div class="card border-0">
+                        <div class="position-relative">
+                            <span class="badge badge-success position-absolute">NEW</span>
+                            <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+                        </div>
+                        <div class="card-body text-center">
+                            <h5 class="card-title">{{ product.name }}</h5>
+                            <p class="card-text">${{ product.price }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- OFFER -->
+        <section class="container-fluid bg-dark text-white py-5">
+            <div class="text-center">
+                <h2 class="offer__title">Special Offer</h2>
+                <p>Special offers discounts for women this week only</p>
+                <a href="#" class="btn btn-outline-light">SHOP NOW</a>
+            </div>
+        </section>
+
+        <!-- NEW ARRIVALS -->
+        <section class="container my-5" id="new">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="section-title">NEW ARRIVALS</h2>
+                <a href="#" class="btn btn-link">View All</a>
+            </div>
+            <div class="row">
+                {% for new_product in new_arrivals %}
+                <div class="col-md-4 mb-4">
+                    <div class="card border-0">
+                        <img src="{{ new_product.image.url }}" class="card-img-top" alt="{{ new_product.name }}">
+                        <div class="card-body text-center">
+                            <a href="#" class="btn btn-primary">VIEW PRODUCT</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- NEWSLETTER -->
+        <section class="container-fluid bg-light py-5 text-center" id="subscribed">
+            <h2 class="section-title">OUR NEWSLETTER</h2>
+            <p>Promotion new products and sales. Directly to your inbox.</p>
+            <form class="form-inline justify-content-center">
+                <input type="email" class="form-control mb-2 mr-sm-2" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary mb-2">SUBSCRIBE</button>
+            </form>
+        </section>
+
+        <!-- SPONSORS -->
+        <section class="container my-5 text-center">
+            <div class="row">
+                <div class="col-md-3 mb-3">
+                    <img src="{% static 'userpanel/img/logo1.png' %}" class="img-fluid" alt="Sponsor 1">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <img src="{% static 'userpanel/img/logo2.png' %}" class="img-fluid" alt="Sponsor 2">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <img src="{% static 'userpanel/img/logo3.png' %}" class="img-fluid" alt="Sponsor 3">
+                </div>
+                <div class="col-md-3 mb-3">
+                    <img src="{% static 'userpanel/img/logo4.png' %}" class="img-fluid" alt="Sponsor 4">
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container text-center">
+            <div class="row">
+                <div class="col-md-3">
+                    <h5>SARA</h5>
+                    <p>Products store</p>
+                </div>
+                <div class="col-md-3">
+                    <h5>EXPLORE</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Home</a></li>
+                        <li><a href="#" class="text-white">Featured</a></li>
+                        <li><a href="#" class="text-white">New</a></li>
+                        <li><a href="#" class="text-white">Subscribe</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>OUR SERVICES</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="#" class="text-white">Pricing</a></li>
+                        <li><a href="#" class="text-white">Free Shipping</a></li>
+                        <li><a href="#" class="text-white">Gift Cards</a></li>
+                        <li><a href="#" class="text-white">FAQ</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5>CONTACT</h5>
+                    <p>Email: info@example.com</p>
+                    <p>Phone: +1 234 567 890</p>
+                </div>
+            </div>
+            <div class="mt-4">
+                <p>© 2024 Fashion Store. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+     <!-- Include Bootstrap JS and dependencies -->
+     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+ </body>
+</body>
+</html>

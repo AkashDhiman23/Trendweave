@@ -1,59 +1,82 @@
 from django.shortcuts import render, redirect # type: ignore
 from django.contrib import messages # type: ignore
 from django.core.mail import send_mail # type: ignore
-from .forms import CustomUserRegisterForm
 from .models import CustomUser
+from django.contrib.auth import authenticate, login as auth_login# type: ignore
+from django.shortcuts import render, redirect# type: ignore
+from django.contrib import messages# type: ignore
+from .forms import CustomUserForm , LoginForm # Ensure you have a form class for user registration
 
 # Create your views here.
 def index(request):
     return render(request, 'index.html')
 
+
+
+def login(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            print(f"Attempting to log in with Email: {email}")  # Debug print
+
+            # Authenticate using email if your user model uses email as the username
+            user = authenticate(request, username=email, password=password)
+            print(f"Authenticated User: {user}")  # Debug print
+
+            if user is not None:
+                auth_login(request, user)
+                messages.success(request, 'Login successful!')
+                print("Login successful, redirecting to index")  # Debug print
+                return redirect('index')  # Make sure 'index' is the correct URL name
+            else:
+                messages.error(request, 'Invalid email or password.')
+                print("Login failed: Invalid email or password.")  # Debug print
+    else:
+        form = LoginForm()
+
+    return render(request, 'login.html', {'form': form})
+
+
 def register(request):
     if request.method == 'POST':
-        form = CustomUserRegisterForm(request.POST)
+        form = CustomUserForm(request.POST)  # Use the form class for validation
         if form.is_valid():
+            # Create a new user instance without hashing the password
             user = CustomUser(
-                username=form.cleaned_data['username'],
                 email=form.cleaned_data['email'],
-                password=form.cleaned_data['password1']  # Store password in plain text for testing
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                password=form.cleaned_data['password']  # Save password in plain text
             )
-            user.generate_otp()  # Generate OTP
-            user.save()
+            user.save()  # Save the user instance
             
-            try:
-                # Send OTP to the user's email
-                send_mail(
-                    'Your OTP Code',
-                    f'Your OTP code is: {user.otp}',
-                    'trendweavenz@outlook.com',  # Your office email address
-                    [user.email],
-                    fail_silently=False,
-                )
-                messages.success(request, 'Registration successful! Check your email for the OTP.')
-                return redirect('users:verify_otp', username=user.username)  # Redirect to OTP verification page
-            
-            except Exception as e:
-                messages.error(request, f'Error sending email: {e}')
-                return render(request, 'register.html', {'form': form})
+            messages.success(request, 'Registration successful! You can log in now.')
+            return render(request, 'login.html', {'form': form})  # Redirect to the login page
     else:
-        form = CustomUserRegisterForm()
+        form = CustomUserForm()  # Create an empty form instance for GET requests
 
     return render(request, 'register.html', {'form': form})
 
-def verify_otp(request, username):
-    try:
-        user = CustomUser.objects.get(username=username)
-    except CustomUser.DoesNotExist:
-        messages.error(request, 'User not found.')
-        return redirect('users:register')  # Redirect to registration page if user not found
 
-    if request.method == 'POST':
-        entered_otp = request.POST.get('otp')
+# Create your views here.
+def dashboard(request):
+    return render(request, 'dashboard.html')
 
-        if user.otp == entered_otp:
-            messages.success(request, 'OTP verified successfully! You can log in now.')
-            return redirect('users:login')  # Redirect to login page
-        else:
-            messages.error(request, 'Invalid OTP. Please try again.')
 
-    return render(request, 'verify_otp.html', {'username': username})
+
+def contact(request):
+    return render(request, 'contact.html')
+
+
+
+
+
+def shop(request):
+    return render(request, 'shop.html')
+
+
+
+
+

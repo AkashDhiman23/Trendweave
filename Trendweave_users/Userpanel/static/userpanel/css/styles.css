@@ -1,16 +1,101 @@
 /* General Styles */
+
+
 body {
   font-family: 'Arial', sans-serif;
 }
 
-/* Header Styles */
+/* Custom styles for the navbar */
 .navbar {
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: black; /* Dark color for the navbar */
 }
 
-.nav__logo {
-  height: 50px; /* Adjust as necessary */
+.navbar-brand img {
+  max-height: 40px; /* Adjust logo size */
+  background-color: white;
+  margin: 10px;
+  margin-left: 30px;
 }
+
+.navbar-nav .nav-link {
+  color: white; /* Text color */
+  padding: 20px 25px; /* Add padding for space around the links */
+  font-size: 17px; /* Font size */
+  font-weight: bold; /* Font weight */
+  text-decoration: none; /* Remove underline by default */
+  transition: color 0.3s, text-decoration 0.3s; /* Smooth transition for color and underline */
+}
+
+.navbar-nav .nav-link.active {
+  color: #d4b892; /* Light brown color for active link */
+}
+
+.navbar-nav .nav-link:hover {
+  color: #d4b892; /* Light brown color on hover */
+  text-decoration: underline; /* Underline on hover */
+}
+
+/* Space between links */
+.navbar-nav .nav-item {
+  margin-right: 15px; /* Space between each nav item */
+}
+
+.navbar-toggler {
+  border-color: #d4b892; /* Light brown color for the toggler */
+}
+
+.navbar-toggler-icon {
+  background-color: #d4b892; /* Light brown color for the toggler icon */
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Categories Background */
+#navbar-vertical {
+  background-color: #d4b892 !important;
+}
+
+/* Wishlist and Cart Icon Colors */
+.navbar .fa-heart, .navbar .fa-shopping-cart, .input-group-text .fa-search {
+  color: #d4b892 !important;
+}
+
+
+
+/* Button background for My Account */
+.btn-group .btn-light.dropdown-toggle {
+  background-color: #343a40 !important; /* Dark background */
+  color: white !important; /* White text */
+}
+
+/* Search Icon Color */
+.input-group-text .fa-search {
+  color: #d4b892 !important;
+}
+
+/* Wishlist and Cart Badge Border and Text Color */
+.badge {
+  color: #d4b892 !important;
+  border-color: #d4b892 !important;
+}
+
+
+
+
+
+
+
 
 /* Home Section */
 #home {

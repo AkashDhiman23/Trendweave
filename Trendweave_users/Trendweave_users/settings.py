@@ -140,3 +140,4 @@ EMAIL_HOST_USER = 'trendweavenz@outlook.com'
 EMAIL_HOST_PASSWORD = 'trendweave@123'  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
+STATIC_URL = '/static/'
