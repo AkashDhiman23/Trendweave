@@ -1,9 +1,9 @@
 from django.http import HttpResponse, JsonResponse # type: ignore
-from django.shortcuts import get_object_or_404, render, redirect # type: ignore
-from .forms import AdminRegisterForm
+from django.shortcuts import get_object_or_404, render, redirect# type: ignore
+from .forms import AdminRegisterForm# type: ignore
 from django.contrib.auth import authenticate, login,logout # type: ignore
 from django.contrib import messages # type: ignore
-from .models import AdminRegister,Category, Subcategory, Product
+from .models import AdminRegister,Category, Subcategory, Product# type: ignore
 from django.utils.text import slugify # type: ignore
 
 
@@ -23,6 +23,7 @@ def index(request):
             if user.password == password:
                 # Set the session to keep the user logged in
                 request.session['admin_id'] = user.admin_id
+                # request.session['first_name']
                 return redirect('dashboard')  # Redirect to the admin dashboard
             else:
                 messages.error(request, "Invalid password")
@@ -74,6 +75,48 @@ def dashboard(request):
         return redirect('index') 
 
 
+def edit_product(request):
+    if request.method == "POST":
+        # Retrieve product ID from the form
+        product_id = request.POST.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+
+        # Update product details
+        product.name = request.POST.get('name')
+        product.description = request.POST.get('description')
+        product.price = request.POST.get('price')
+        product.stock = request.POST.get('stock')
+        product.size = request.POST.get('size')  # Update size attribute
+        product.category_id = request.POST.get('category')
+        product.subcategory_id = request.POST.get('subcategory') or None  # Set to None if no subcategory is selected
+
+        # Handle image uploads if necessary
+        if 'image_1' in request.FILES:
+            product.image_1 = request.FILES['image_1']
+        if 'image_2' in request.FILES:
+            product.image_2 = request.FILES['image_2']
+        if 'image_3' in request.FILES:
+            product.image_3 = request.FILES['image_3']
+
+        # Save the updated product details to the database
+        product.save()
+
+        # Redirect to the product list page (replace 'product_list' with your actual view name)
+        return redirect('product_list')
+
+    elif request.method == "GET":
+        # Retrieve product ID from the query parameters
+        product_id = request.GET.get('product_id')
+        product = get_object_or_404(Product, pk=product_id)
+        categories = Category.objects.all()
+        subcategories = Subcategory.objects.all()
+
+        # Render the template with the product details and lists of categories/subcategories
+        return render(request, 'product.html', {
+            'product': product,
+            'categories': categories,
+            'subcategories': subcategories
+        })
 
 
 
@@ -114,18 +157,19 @@ def category_view(request):
     return render(request, 'category.html', {'categories': categories})
 
 
+
 def add_category(request):
     if request.method == 'POST':
         # Get the category name and description from the form data
         category_name = request.POST.get('category_name')
         category_description = request.POST.get('category_description')
 
+        # Check if the category name is provided
+        if not category_name:
+            return JsonResponse({'status': 'error', 'message': 'Category name is required.'})
+
         # Generate the slug from the category name
         category_slug = slugify(category_name)
-
-        # Check if the category with the same slug already exists
-        if Category.objects.filter(slug=category_slug).exists():
-            return JsonResponse({'status': 'error', 'message': 'A category with this slug already exists.'})
 
         # Get the admin instance using the admin_id from the session
         admin_id = request.session.get('admin_id')
@@ -143,10 +187,10 @@ def add_category(request):
         )
         category.save()
 
+        # Redirect to the category list or another appropriate view
         return render(request, 'category.html')
 
     return render(request, 'category.html')
-
 
 
 
@@ -228,33 +272,45 @@ def add_product(request):
         description = request.POST.get('description')
         price = request.POST.get('price')
         stock = request.POST.get('stock')
+        size = request.POST.get('size')  # Get size from the form
         image_1 = request.FILES.get('image_1')
         image_2 = request.FILES.get('image_2')
         image_3 = request.FILES.get('image_3')
         category_id = request.POST.get('category')
         subcategory_id = request.POST.get('subcategory')
 
-           # Get the admin_id from the session
+        # Get the admin_id from the session
         admin_id = request.session.get('admin_id')
 
         # Debugging: Print the values received
-        print(f"Category ID: {category_id}, Subcategory ID: {subcategory_id}")
+        print(f"Category ID: {category_id}, Subcategory ID: {subcategory_id}, Size: {size}")
 
-          # Retrieve the AdminRegister instance
+        # Retrieve the AdminRegister instance
         admin_instance = get_object_or_404(AdminRegister, admin_id=admin_id)
-
 
         # Validate that category_id is not empty
         if not category_id:
-            return render(request, 'product.html', {'error': 'Category is required', 'categories': Category.objects.all(), 'subcategories': Subcategory.objects.all()})
+            return render(request, 'product.html', {
+                'error': 'Category is required',
+                'categories': Category.objects.all(),
+                'subcategories': Subcategory.objects.all()
+            })
 
         # Validate that the category exists
         if not Category.objects.filter(pk=category_id).exists():
-            return render(request, 'product.html', {'error': 'Invalid category selected', 'categories': Category.objects.all(), 'subcategories': Subcategory.objects.all()})
+            return render(request, 'product.html', {
+                'error': 'Invalid category selected',
+                'categories': Category.objects.all(),
+                'subcategories': Subcategory.objects.all()
+            })
 
         # Validate that the subcategory exists
         if not Subcategory.objects.filter(pk=subcategory_id).exists():
-            return render(request, 'product.html', {'error': 'Invalid subcategory selected', 'categories': Category.objects.all(), 'subcategories': Subcategory.objects.all()})
+            return render(request, 'product.html', {
+                'error': 'Invalid subcategory selected',
+                'categories': Category.objects.all(),
+                'subcategories': Subcategory.objects.all()
+            })
 
         # Create and save the product instance
         product = Product(
@@ -262,6 +318,7 @@ def add_product(request):
             description=description,
             price=price,
             stock=stock,
+            size=size, 
             admin_id=admin_instance,
             image_1=image_1,
             image_2=image_2,
@@ -275,35 +332,10 @@ def add_product(request):
     # Retrieve categories and subcategories to display in the form
     categories = Category.objects.all()
     subcategories = Subcategory.objects.all()
-    return render(request, 'product.html', {'categories': categories, 'subcategories': subcategories})
-
-
-
-def edit_product(request):
-    if request.method == "POST":
-        product_id = request.POST.get('product_id')
-        product = get_object_or_404(Product, pk=product_id)
-
-        product.name = request.POST.get('name')
-        product.description = request.POST.get('description')
-        product.price = request.POST.get('price')
-        product.stock = request.POST.get('stock')
-        product.category_id = request.POST.get('category')
-        product.subcategory_id = request.POST.get('subcategory')
-
-        # Handle image uploads if necessary
-        if 'image_1' in request.FILES:
-            product.image_1 = request.FILES['image_1']
-        if 'image_2' in request.FILES:
-            product.image_2 = request.FILES['image_2']
-        if 'image_3' in request.FILES:
-            product.image_3 = request.FILES['image_3']
-
-        product.save()
-        return redirect('product.html')  # Redirect to the product list page
-    
-
-
+    return render(request, 'product.html', {
+        'categories': categories,
+        'subcategories': subcategories
+    })
 
 
 def edit_category(request):

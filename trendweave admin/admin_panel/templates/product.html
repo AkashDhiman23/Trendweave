@@ -208,6 +208,7 @@
                     <th>Category</th>
                     <th>Subcategory</th>
                     <th>Description</th>
+                    <th>Size</th>
                     <th>Price</th>
                     <th>Quantity</th>
                     <th>Actions</th>
@@ -223,6 +224,7 @@
                             <td>{{ product.category.name }}</td>
                             <td>{{ product.subcategory.name }}</td>
                             <td>{{ product.description }}</td>
+                            <td>{{ product.size }}</td>
                             <td>${{ product.price }}</td>
                             <td>{{ product.stock }}</td>
                             <td>
@@ -250,6 +252,8 @@
     </div>
 
     <!-- Modal for Adding Product -->
+   
+    <!-- Modal for Adding Product -->
     <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -275,11 +279,16 @@
                             <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
                             <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
                         </div>
+                        
                 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="stock" class="form-label">Quantity <span class="text-danger">*</span></label>
                                 <input type="number" class="form-control" id="stock" name="stock" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="size" class="form-label">Size <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="size" name="size" required>
                             </div>
                             <div class="col-md-6">
                                 <label for="categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
@@ -290,8 +299,8 @@
                                     {% endfor %}
                                 </select>
                             </div>
-                        </div>
-                
+                            </div>
+                      
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>

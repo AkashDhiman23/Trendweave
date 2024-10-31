@@ -40,7 +40,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Custom apps
-    'admin_panel',
+  
+      'admin_panel',
+    
 ]
 
 MIDDLEWARE = [

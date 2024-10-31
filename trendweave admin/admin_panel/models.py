@@ -1,8 +1,8 @@
 import random
 from django.db import models # type: ignore
-from django.utils.text import slugify # type: ignore
-import random
-import string
+from django.utils.text import slugify# type: ignore
+import random# type: ignore
+import string# type: ignore
 from pydantic import ValidationError # type: ignore
 
 
@@ -137,6 +137,7 @@ class Product(models.Model):
     )
     price = models.DecimalField(max_digits=10, decimal_places=2)
     stock = models.PositiveIntegerField(help_text="Number of items available in stock")
+    size = models.CharField(max_length=50, blank=True, null=True, help_text="Size of the product (e.g., Small, Medium, Large)")
     image_1 = models.ImageField(upload_to='products/', blank=True, null=True, help_text="Primary image of the product")
     image_2 = models.ImageField(upload_to='products/', blank=True, null=True, help_text="Secondary image of the product")
     image_3 = models.ImageField(upload_to='products/', blank=True, null=True, help_text="Tertiary image of the product")

@@ -5,13 +5,22 @@ from .models import CustomUser
 from django.contrib.auth import authenticate, login as auth_login# type: ignore
 from django.shortcuts import render, redirect# type: ignore
 from django.contrib import messages# type: ignore
+
 from .forms import CustomUserForm , LoginForm # Ensure you have a form class for user registration
 
-# Create your views here.
 def index(request):
-    return render(request, 'index.html')
-
-
+    from admin_panel.models import Category, Subcategory, Product  # Move import here
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    subcategories = Subcategory.objects.all()
+    
+    context = {
+        'products': products,
+        'categories': categories,
+        'subcategories': subcategories,
+    }
+    
+    return render(request, 'index.html', context)
 
 def login(request):
     if request.method == 'POST':
@@ -57,7 +66,7 @@ def register(request):
     else:
         form = CustomUserForm()  # Create an empty form instance for GET requests
 
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'registeration.html', {'form': form})
 
 
 # Create your views here.
