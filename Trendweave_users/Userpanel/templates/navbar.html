@@ -1,100 +1,69 @@
 {% load static %}
- <!-- Topbar Start -->
- <div class="container-fluid" >
-    <div class="row bg-white py-1 px-xl-5">
-        <div class="col-lg-6 d-none d-lg-block text-white">
-            <div class="d-inline-flex align-items-center h-100">
-              <a class="text-body mr-3" href="">About</a>
-              <a class="text-body mr-3" href="/contact/">Contact</a>
-              <a class="text-body mr-3" href="">Help</a>
-              <a class="text-body mr-3" href="">FAQs</a>
-            </div>
-          </div>
-          
-      <div class="col-lg-6 text-center text-lg-right">
-        <div class="d-inline-flex align-items-center">
-          <div class="btn-group">
-            <button
-              type="button"
-              class="btn btn-sm btn-light dropdown-toggle"
-              data-toggle="dropdown"
-            >
-              My Account
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-              {% if user.is_authenticated %}
-              <a href="/logout/" class="dropdown-item" type="button"
-                >Sign out</a
-              >
-              <a href="/myorders/" class="dropdown-item" type="button"
-                >My Orders</a
-              >
+<!-- Topbar Start -->
+<div class="container-fluid">
+  <div class="row bg-white py-1 px-xl-5">
+    <div class="col-lg-6 d-none d-lg-block text-white">
+      <div class="d-inline-flex align-items-center h-100">
+        <a class="text-body mr-3" href="">About</a>
+        <a class="text-body mr-3" href="/contact/">Contact</a>
+ 
+      </div>
+    </div>
 
-              {% else %}
-              <a href="/login/" class="dropdown-item" type="button"
-                style="color: black;">Sign in</a
-              >
-              <a href="/register/" class="dropdown-item" type="button" style="color: black;"
-                >Sign up</a
-              >
-              {% endif %}
-            </div>
-          </div>
+    <div class="col-lg-6 text-center text-lg-right">
+      <div class="d-inline-flex align-items-center">
+        <div class="btn-group">
+          <button
+            type="button"
+            class="btn btn-sm btn-light dropdown-toggle"
+            data-toggle="dropdown"
+          >
+            My Account
+          </button>
+          <div class="dropdown-menu dropdown-menu-right">
+       
+            {% if request.session.user_id %}
+                <a href="/profile/" class="dropdown-item">My Profile</a>
+                <a href="/myorders/" class="dropdown-item">My Orders</a>
+                <a href="/logout/" class="dropdown-item">Sign out</a>
+            {% else %}
+                <a href="/login/" class="dropdown-item">Sign in</a>
+                <a href="/register/" class="dropdown-item">Sign up</a>
+            {% endif %}
+         
         </div>
-        <div class="d-inline-flex align-items-center d-block d-lg-none">
-          <a href="" class="btn px-0 ml-2">
-            <i class="fas fa-heart text-dark"></i>
-            <span
-              class="badge text-dark border border-dark rounded-circle"
-              style="padding-bottom: 2px"
-              >0</span
-            >
-          </a>
-          <a href="" class="btn px-0 ml-2">
-            <i class="fas fa-shopping-cart text-dark"></i>
-            <span
-              class="badge text-dark border border-dark rounded-circle"
-              style="padding-bottom: 2px"
-              >0</span
-            >
-          </a>
         </div>
-      </div>
-    </div>
-    <div
-      class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex"
-    >
-    <div class="col-lg-4">
-      <a href="" class="text-decoration-none" >
-        <img src="{% static 'userpanel\img\LOGO.png' %}" alt="Logo" class="h1 text-uppercase text-light bg-dark px-2" style="max-width: 200px; height: auto;">
-      </a>
-    </div>
-      <div class="col-lg-4 col-6 text-left">
-        <form action="/search/" method="get">
-          <div class="input-group">
-            <input
-              type="text"
-              name="quary"
-              class="form-control"
-              placeholder="Search for products"
-            />
-            <div class="input-group-append">
-              <span class="input-group-text bg-transparent text-primary">
-                <i class="fa fa-search"></i>
-              </span>
-            </div>
-          </div>
-        </form>
-      </div>
-      <div class="col-lg-4 col-6 text-right">
-        <p class="m-0">Customer Service</p>
-        <h5 class="m-0">+64 345 6789</h5>
       </div>
     </div>
   </div>
-  <!-- Topbar End -->
 
- <!-- Navbar Start -->
+  <div class="row align-items-center bg-light py-3 px-xl-5 d-none d-lg-flex">
+    <div class="col-lg-4">
+      <a href="/" class="text-decoration-none">
+        <img src="{% static 'userpanel/img/LOGO.png' %}" alt="Logo" class="h1 text-uppercase text-light bg-dark px-2" style="max-width: 200px; height: auto;">
+      </a>
+    </div>
+    <div class="col-lg-4 col-6 text-left">
+      <form action="/search/" method="get">
+        <div class="input-group">
+          <input type="text" name="query" class="form-control" placeholder="Search for products" />
+          <div class="input-group-append">
+            <span class="input-group-text bg-transparent text-primary">
+              <i class="fa fa-search"></i>
+            </span>
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="col-lg-4 col-6 text-right">
+      <p class="m-0">Customer Service</p>
+      <h5 class="m-0">+64 345 6789</h5>
+    </div>
+  </div>
+</div>
+<!-- Topbar End -->
+
+<!-- Navbar Start -->
 <div class="container-fluid bg-dark mb-30">
   <div class="row px-xl-5">
     <div class="col-lg-3 d-none d-lg-block">
@@ -128,23 +97,18 @@
             <a href="/" class="nav-item nav-link active">Home</a>
             <a href="/shop/" class="nav-item nav-link">Shop</a>
             <a href="/contact/" class="nav-item nav-link">Contact</a>
+            {% if user.is_authenticated %}
+            <a href="/myorders/" class="nav-item nav-link">My Orders</a>
+            {% endif %}
           </div>
           <div class="navbar-nav ml-auto py-0 d-none d-lg-block">
             <a href="/wish/" class="btn px-0">
               <i class="fas fa-heart text-primary"></i>
-              <span
-                class="badge text-secondary border border-secondary rounded-circle"
-                style="padding-bottom: 2px"
-                >0</span
-              >
+              <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px">0</span>
             </a>
             <a href="/cart/" class="btn px-0 ml-3">
               <i class="fas fa-shopping-cart text-primary"></i>
-              <span
-                class="badge text-secondary border border-secondary rounded-circle"
-                style="padding-bottom: 2px"
-                >0</span
-              >
+              <span class="badge text-secondary border border-secondary rounded-circle" style="padding-bottom: 2px">0</span>
             </a>
           </div>
         </div>
@@ -152,3 +116,4 @@
     </div>
   </div>
 </div>
+<!-- Navbar End -->

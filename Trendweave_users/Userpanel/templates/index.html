@@ -35,6 +35,10 @@
     .bg-dark, .bg-secondary, .navbar-dark .navbar-nav .nav-link, .navbar-dark .navbar-toggler-icon {
     color: white !important;
 }
+.img-fluid {
+        max-height: 300px; /* Set a consistent height */
+        object-fit: cover; /* Maintain aspect ratio */
+    }
 
 
     </style>
@@ -219,18 +223,13 @@
           </a>
           <!-- Products under each category -->
           <div class="products">
-            {% for product in category.product_set.all %}
-            <div class="product-item">
-                {% if product.image_1 %}
-                    <img src="{{ product.image_1.url }}" alt="{{ product.name }}" class="product-image">
-                {% else %}
-                    <img src="{% static 'path/to/default_image.jpg' %}" alt="No Image Available" class="product-image">
-                {% endif %}
-                <h6>{{ product.name }}</h6>
-                <small class="text-body">{{ product.description|truncatewords:10 }}</small>
-            </div>
-            {% endfor %}
-        </div>
+              {% for product in category.product_set.all %}
+              <div class="product-item">
+                  <h6>{{ product.name }}</h6>
+                  <small class="text-body">{{ product.description|truncatewords:10 }}</small>
+              </div>
+              {% endfor %}
+          </div>
       </div>
       {% endfor %}
   </div>
@@ -245,14 +244,16 @@
     <div class="col-lg-3 col-md-4 col-sm-6 pb-1">
       <div class="product-item bg-light mb-4">
         <div class="product-img position-relative overflow-hidden">
-          <img class="img-fluid w-100" src="{{ product.image_1.url }}" alt="{{ product.name }}" /> 
+          {% load static %}
+          <img class="img-fluid w-100" src="{% static product.image_1 %}" alt="{{ product.name }}" style="height:200px;" />
+
         </div>
         <div class="text-center py-4">
           <a class="h5 text-decoration-none text-truncate" href="#" style="color: #98784b; font-weight: bold;">{{ product.name }}</a>
           <div class="d-flex align-items-center justify-content-center mt-2">
             <h5>${{ product.price }}</h5>
           </div>
-          <a href="#" class="btn mt-3" style="background-color: black; color: white;">View Detail</a>
+          <a href="{% url 'product' product.product_id %}" class="btn mt-3" style="background-color: black; color: white;">View Detail</a>
         </div>
       </div>
     </div>

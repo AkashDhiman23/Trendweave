@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{% static 'userpanel/css/styles.css' %}">
+
+    <title>Product Detail | Fashion Store</title>
+</head>
+<body>
+    
+    {% include 'navbar.html' %}
+
+     <!-- Breadcrumb Start -->
+<div class="container-fluid">
+    <div class="row px-xl-5">
+      <div class="col-12">
+        <nav class="breadcrumb bg-light mb-30">
+          <a class="breadcrumb-item text-dark" href="/">Home</a>
+          <span class="breadcrumb-item active">Product Detail</span>
+        </nav>
+      </div>
+    </div>  
+  </div>
+  
+  
+    <!-- Product Detail Start -->
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-lg-5 mb-30">
+                <div class="row">
+                    <!-- Left Side Image Gallery -->
+                    <div class="col-12 mb-3">
+                        <img class="img-fluid w-100" src="{% static product.image_1 %}" alt="{{ product.name }}" />
+                    </div>
+                    <div class="col-4">
+                        <img class="img-fluid" src="{% static product.image_2 %}" alt="{{ product.name }} - Image 2" class="img-thumbnail" />
+                    </div>
+                    <div class="col-4">
+                        <img class="img-fluid" src="{% static product.image_3 %}" alt="{{ product.name }} - Image 3" class="img-thumbnail" />
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-7 mb-30">
+                <h3 class="font-weight-semi-bold">{{ product.name }}</h3>
+                <h4 class="font-weight-bold text-primary mb-4" id="price">${{ product.price }}</h4>
+                <p class="mb-4">{{ product.description }}</p>
+
+                <div class="d-flex mb-3">
+                    <strong class="text-uppercase mr-3">Size:</strong>
+                    <span>{{ product.size }}</span>
+                </div>
+
+                <div class="d-flex mb-4">
+                    <strong class="text-uppercase mr-3">Quantity:</strong>
+                    <input type="number" class="form-control w-25" value="1" min="1" id="quantity" />
+                </div>
+
+                <div class="d-flex mb-4">
+                    <strong class="text-uppercase mr-3">Total Price:</strong>
+                    <span class="font-weight-bold text-primary" id="totalPrice">${{ product.price }}</span>
+                </div>
+
+                <!-- Change the button class to 'btn-black' -->
+                <button class="btn btn-black mr-2"><i class="fa fa-shopping-cart"></a></i> Add to Cart</button>
+                <button class="btn btn-outline-secondary"><i class="fa fa-heart"></i> Add to Wishlist</button>
+            </div>
+        </div>
+    </div>
+    <!-- Product Detail End -->
+     
+       
+    <!-- JavaScript Libraries -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            const price = parseFloat("{{ product.price }}"); // Get the product price
+            const quantityInput = $('#quantity');
+            const totalPriceDisplay = $('#totalPrice');
+
+            // Function to update total price
+            function updateTotalPrice() {
+                const quantity = parseInt(quantityInput.val());
+                const totalPrice = (price * quantity).toFixed(2); // Calculate total price
+                totalPriceDisplay.text(`$${totalPrice}`); // Update total price display
+            }
+
+            // Event listener for quantity change
+            quantityInput.on('input', updateTotalPrice);
+
+            // Initialize total price on page load
+            updateTotalPrice();
+        });
+    </script>
+
+    <style>
+        /* Custom style for black button */
+        .btn-black {
+            background-color: black; 
+            color: white; 
+            border: none; 
+        }
+        
+        .btn-black:hover {
+            background-color: #333; /* Darker on hover */
+            color: white;
+        }
+    </style>
+</body>
+</html>

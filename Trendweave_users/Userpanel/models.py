@@ -1,5 +1,7 @@
 from django.db import models# type: ignore
 import random
+from django.conf import settings # type: ignore
+from admin_panel.models import Product
 
 
 class CustomUser(models.Model):
@@ -18,3 +20,12 @@ class CustomUser(models.Model):
                     self.customuser_id = random_id
                     break
         super().save(*args, **kwargs)
+
+class Cart(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_on = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return f"{self.user.username} - {self.product.name}"
