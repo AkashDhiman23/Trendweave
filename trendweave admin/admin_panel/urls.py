@@ -1,5 +1,8 @@
 from django.urls import path # type: ignore
 from . import views
+from django.conf import settings# type: ignore
+from django.conf.urls.static import static# type: ignore
+
 
 urlpatterns = [
     path('', views.index, name='index'),  
@@ -20,4 +23,4 @@ urlpatterns = [
     path('edit-subcategory/', views.edit_subcategory, name='edit_subcategory'),
     path('delete-subcategory/', views.delete_subcategory, name='delete_subcategory'),
     path('delete-product/<int:product_id>/', views.delete_product, name='delete_product'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

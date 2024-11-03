@@ -143,5 +143,5 @@ EMAIL_HOST_USER = 'trendweavenz@outlook.com'
 EMAIL_HOST_PASSWORD = 'trendweave@123'  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = 'http://localhost:8000/media/'
+LOGIN_URL = '/Userpanel/login/'

@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login as auth_login# type: ignore
 from django.shortcuts import render, redirect# type: ignore
 from django.contrib import messages# type: ignore
 
-from .forms import CustomUserForm , LoginForm # Ensure you have a form class for user registration
+from .forms import CustomUserForm 
 
 def index(request):
     from admin_panel.models import Category, Subcategory, Product  # Move import here
@@ -24,28 +24,21 @@ def index(request):
 
 def login(request):
     if request.method == 'POST':
-        form = LoginForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            password = form.cleaned_data['password']
-            print(f"Attempting to log in with Email: {email}")  # Debug print
-
-            # Authenticate using email if your user model uses email as the username
-            user = authenticate(request, username=email, password=password)
-            print(f"Authenticated User: {user}")  # Debug print
-
-            if user is not None:
-                auth_login(request, user)
-                messages.success(request, 'Login successful!')
-                print("Login successful, redirecting to index")  # Debug print
-                return redirect('index')  # Make sure 'index' is the correct URL name
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        
+        try:
+            user = CustomUser.objects.get(email=email)  # Query the user by email
+            if user.password == password:  # Direct password comparison
+                request.session['user_id'] = user.customuser_id
+                return redirect('shop')  # Redirect to a success page
             else:
-                messages.error(request, 'Invalid email or password.')
-                print("Login failed: Invalid email or password.")  # Debug print
-    else:
-        form = LoginForm()
+                messages.error(request, "Invalid password.")
+        except CustomUser.DoesNotExist:
+            messages.error(request, "No user with this email exists.")
+    
+    return render(request, 'login.html')
 
-    return render(request, 'login.html', {'form': form})
 
 
 def register(request):
@@ -83,7 +76,19 @@ def contact(request):
 
 
 def shop(request):
-    return render(request, 'shop.html')
+    from admin_panel.models import Category, Subcategory, Product  
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    subcategories = Subcategory.objects.all()
+    
+    context = {
+        'products': products,
+        'categories': categories,
+        'subcategories': subcategories,
+    }
+    
+    return render(request, 'shop.html', context)
+
 
 
 
