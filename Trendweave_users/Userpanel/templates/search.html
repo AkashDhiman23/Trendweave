@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
-{% include 'navbar.html' %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -24,38 +23,10 @@
 
     <title>Fashion Store Website</title>
 </head>
-<style>
-    .bg-dark, .bg-secondary, .navbar-dark .navbar-nav .nav-link, .navbar-dark .navbar-toggler-icon {
-        color: white !important;
-    }
-    .product-img {
-        position: relative;
-    }
-    .wishlist-icon {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        font-size: 24px;
-       
-        z-index: 10;
-    }
-    .card-footer a {
-        font-weight: bold;
-        color: black; /* Bold black for View Details */
-    }
-    .btn-add-to-cart {
-        background-color: black; /* Black background for Add to Cart */
-        color: white;
-    }
-    .img-fluid {
-        max-height: 300px; /* Set a consistent height */
-        object-fit: cover; /* Maintain aspect ratio */
-    }
-</style>
 <body>
 
     <!-- Topbar Start -->
-
+    {% include 'navbar.html' %}
     
     <!-- Breadcrumb Start -->
     <div class="container-fluid">

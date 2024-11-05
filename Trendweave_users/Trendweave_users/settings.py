@@ -25,7 +25,20 @@ SECRET_KEY = 'django-insecure-3mhdwi7l63$+u5j8h-jk2z3&zyk-rt1k7wj59wul4b3r&*5h25
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+
+
+AUTHENTICATION_BACKENDS = [
+    'Userpanel.auth_backends.CustomUserBackend',  
+    'django.contrib.auth.backends.ModelBackend',  # Keep the default backend if needed
+]
+
+
 ALLOWED_HOSTS = []
+
+# AUTHENTICATION_BACKENDS = (
+#     'Userpanel.backends.EmailBackend', 
+#     'django.contrib.auth.backends.ModelBackend',  # Keep the default as a fallback
+# )
 
 
 # Application definition
@@ -37,20 +50,26 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'admin_panel',  
-    'Userpanel',    
+    'admin_panel',  # Make sure this is included
+    'Userpanel',    # Ensure Userpanel is also included
     
 ]
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    
+ 
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+
+    
 ]
 
 ROOT_URLCONF = 'Trendweave_users.urls'
@@ -58,18 +77,19 @@ ROOT_URLCONF = 'Trendweave_users.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': ['templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                'django.contrib.messages.context_processors.messages',    
             ],
         },
     },
 ]
+
 
 WSGI_APPLICATION = 'Trendweave_users.wsgi.application'
 
@@ -92,6 +112,10 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'Userpanel/static',  
 ]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -143,5 +167,6 @@ EMAIL_HOST_USER = 'trendweavenz@outlook.com'
 EMAIL_HOST_PASSWORD = 'trendweave@123'  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-MEDIA_URL = 'http://localhost:8000/media/'
 LOGIN_URL = '/Userpanel/login/'
+
+

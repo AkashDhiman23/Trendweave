@@ -208,9 +208,7 @@
         </div>
         <!-- Size End -->
       </div>
-      <!-- Shop Sidebar End -->
   
-      <!-- Shop Product Start -->
       <div class="col-lg-9 col-md-8">
         <div class="row pb-3">
           <div class="col-12 pb-1">
@@ -275,10 +273,12 @@
                   </div>
                   <div class="card-footer d-flex justify-content-between bg-light border">
                       <a href="{% url 'product' product.product_id %}">View Details</a>
-                      <a href="/cart/add/{{ product.product_id }}" class="btn btn-sm btn-add-to-cart" style="color: white;">Add to Cart</a>
+                      <a href="{% url 'add_cart' product.product_id %}" class="btn btn-sm btn-add-to-cart" style="color: white;">Add to Cart</a>
+
                   </div>
               </div>
           </div>
+     
           {% endfor %}
       </div>
   </div>
@@ -288,7 +288,28 @@
 
   <!-- Shop End -->
 
+  <script>
+    function addToCart(productId) {
+        const quantity = document.getElementById(`quantity-${productId}`).value;
 
+        $.ajax({
+            url: "{% url 'add_cart' 0 %}".replace('0', productId), // Replace '0' with actual product_id in URL
+            type: "POST",
+            data: {
+                'quantity': quantity,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'  // Ensure CSRF token is included
+            },
+            success: function(response) {
+                alert(response.message + ". Quantity: " + response.quantity);
+                // Optionally, update the cart count or display a message
+            },
+            error: function(xhr) {
+                alert("Something went wrong. Please try again.");
+            }
+        });
+    }
+
+</script>
     
 
  

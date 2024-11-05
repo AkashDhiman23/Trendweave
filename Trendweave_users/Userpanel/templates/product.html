@@ -71,8 +71,10 @@
                 </div>
 
                 <!-- Change the button class to 'btn-black' -->
-                <button class="btn btn-black mr-2"><i class="fa fa-shopping-cart"></a></i> Add to Cart</button>
-                <button class="btn btn-outline-secondary"><i class="fa fa-heart"></i> Add to Wishlist</button>
+                <a href="{% url 'add_cart' product.product_id %}" class="btn btn-sm btn-add-to-cart" style="color: white;">Add to Cart</a>
+
+                <a href="{% url 'add_wish' pid=product.product_id %}" class="btn btn-outline-secondary">
+                    <i class="fa fa-heart"></i> Add to Wishlist
             </div>
         </div>
     </div>
@@ -119,3 +121,44 @@
     </style>
 </body>
 </html>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const addToCartButtons = document.querySelectorAll('.add-to-cart');
+    
+        addToCartButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault(); // Prevent the default form submission
+                
+                const productId = this.getAttribute('data-product-id'); // Get the product ID
+                const url = `/add_cart/${productId}/`; // Construct the URL
+    
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}', // Send CSRF token for security
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        // Include any additional data you want to send
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Update UI based on the response
+                    if (data.success) {
+                        // Optionally, show a success message
+                        alert(data.message);
+                        // Update cart item count or other UI elements
+                    } else {
+                        // Show error message
+                        alert(data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                });
+            });
+        });
+    });
+    </script>
+    
