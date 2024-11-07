@@ -1,15 +1,22 @@
 from urllib import request
+from django.http import Http404
+from django.shortcuts import redirect
 from django.shortcuts import get_object_or_404, render, redirect # type: ignore
 from django.contrib import messages # type: ignore
 from django.core.mail import send_mail # type: ignore
 from django.contrib.auth.decorators import login_required
-from .models import CustomUser ,Wish, Cart
+from django.views import View
+import stripe
+from .models import CustomUser ,Wish, Cart ,Order,OrderItem,Payment
 from django.contrib.auth import authenticate, login 
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth.models import User,auth
 from .forms import CustomUserForm , LoginForm # Ensure you have a form class for user registration
 from django.http import JsonResponse
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
 
 def login(request):
@@ -87,8 +94,43 @@ def contact(request):
 
 
 def cart(request):
-    return render(request, 'cart.html')
+    from admin_panel.models import Category, Subcategory, Product
+     # Filter the wishlist items for the currently authenticated user
+    data = Cart.objects.select_related('product').filter(customuser=request.user)  
 
+    g_total = 0
+    for d in data:
+        g_total += d.sub_total()  # Assuming this method calculates the subtotal for each item
+
+    # Render the wishlist template with the wishlist data and grand total
+    return render(request, 'cart.html', {'data': data, 'g_total': g_total})
+  
+
+def delete_cart(request,cart_item_id ):
+    c = Cart.objects.get(cart_item_id =cart_item_id )
+    c.delete()
+    messages.warning(request,'Product is deleted from cart...')
+    return redirect('/cart/')
+
+
+def plus_cart(request,cart_item_id ):
+    c = Cart.objects.get(cart_item_id =cart_item_id )
+    c.quantity += 1
+    c.save()
+    messages.success(request,'Quantity is Plus by one...')
+    return redirect('/cart/')
+
+def minus_cart(request,cart_item_id ):
+    c = Cart.objects.get(cart_item_id =cart_item_id )
+    if c.quantity > 1:
+        c.quantity -= 1
+        c.save()
+        messages.info(request,'Quantity is Minus by one...')
+    else:
+        c.delete()
+        messages.info(request,'Quantity is Minus by one...')
+
+    return redirect('/cart/')
 
 
     
@@ -125,7 +167,7 @@ def product(request, product_id):
 
 
 
-@login_required
+
 def add_cart(request, product_id):
     from admin_panel.models import Product
     product = get_object_or_404(Product, product_id=product_id)
@@ -143,7 +185,7 @@ def add_cart(request, product_id):
         cart_item.save()
         message = 'Product quantity updated in your cart.'
 
-    return JsonResponse({'success': True, 'message': message})
+    return redirect('shop')
 
 
 
@@ -219,23 +261,7 @@ def profile(request):
 
     return render(request, 'myprofile.html', context)
 
-@login_required(login_url='/login/')
-def cart_view(request):
-    # Get all cart items for the current user
-    cart_items = Cart.objects.filter(CustomUser=request.user)
 
-    # Calculate subtotal for each item and the grand total
-    grand_total = 0
-    for item in cart_items:
-        item.sub_total = item.product.price * item.quantity
-        grand_total += item.sub_total
-
-    # Pass cart data to template
-    context = {
-        'data': cart_items,
-        'g_total': grand_total,
-    }
-    return render(request, 'cart.html', context)
 
 def filter_products(request):
     prices = request.GET.getlist('prices[]')  # Adjust to match how data is sent
@@ -253,3 +279,207 @@ def filter_products(request):
     product_list = [{'product_id': product.id, 'name': product.name, 'price': product.price, 'image_1': product.image_1.url} for product in products]
 
     return JsonResponse({'products': product_list})
+
+
+
+
+
+def home(request):
+    from admin_panel.models import Category, Subcategory, Product  # Move import here
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    subcategories = Subcategory.objects.all()
+    
+    context = {
+        'products': products,
+        'categories': categories,
+        'subcategories': subcategories,
+    }
+    
+    return render(request, 'home.html', context)
+
+
+
+
+def checkout(request):
+    from admin_panel.models import Category, Subcategory, Product
+    data = Cart.objects.filter(customuser=request.user)
+    g_total = 0
+    for d in data:
+        g_total += d.sub_total()
+
+    total = g_total + 10  # Fixed shipping fee
+    total_in_cents = total * 100  # Convert to cents for Stripe payment
+
+    if request.method == 'POST':
+        # Get POST data from the form
+        name = request.POST['name']
+        email = request.POST['email']
+        phone = request.POST['phone']
+        address = request.POST['address']
+        city = request.POST['city']
+        state = request.POST['state']
+        zip = request.POST['zip']
+        payment = request.POST['payment']
+
+        # Handle Cash on Delivery
+        if payment == '1':  # Cash on Delivery
+            order_type = 'Cash On Delivery'
+            order = Order(
+                name=name, email=email, phone=phone, address=address,
+                city=city, state=state, zip=zip, p_type=order_type,
+                customuser=request.user, amount=total
+            )
+            order.save()
+
+            # Create OrderItems for each product in the cart
+            for d in data:
+                p = Product.objects.get(product_id=d.product.product_id)  # Correctly access the product
+                order_item = OrderItem(
+                    order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+                )
+                order_item.save()
+
+                # Delete the cart item after adding it to the order
+                d.delete()
+
+            messages.success(request, 'Order is saved...')
+            return redirect('/confirmorder/' + str(order.order_id))
+
+        else:  # Stripe payment
+            order_type = 'Stripe'
+            order = Order(
+                name=name, email=email, phone=phone, address=address,
+                city=city, state=state, zip=zip, p_type=order_type,
+                customuser=request.user, amount=total
+            )
+            order.save()
+
+            # Create OrderItems for each product in the cart
+            for d in data:
+                p = Product.objects.get(product_id=d.product.product_id)  # Correctly access the product
+                order_item = OrderItem(
+                    order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+                )
+                order_item.save()
+
+                # Delete the cart item after adding it to the order
+                d.delete()
+
+            # Redirect to the Stripe payment page
+            return redirect('/payment/stripe/' + str(order.order_id) + '/')
+
+    # Render the checkout page with the cart data
+    return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
+
+
+
+
+def myorders(request):
+    data = Order.objects.filter(customuser=request.user)
+    return render(request,'myorder.html',{'data':data})
+
+def confirmorder(request, order_id):
+    order_data = Order.objects.get(order_id=order_id)
+    order_item_data = OrderItem.objects.filter(order=order_data)  # Filter by the order instance
+
+    return render(request, 'confirmorder.html', {'order_data': order_data, 'order_item_data': order_item_data})
+
+
+def process_payment(request, order_id):
+    order = Order.objects.get(id=order_id)
+    
+    if request.method == 'POST':
+        try:
+            payment_method_id = request.POST['payment_method_id']
+            
+            if not payment_method_id:
+                return JsonResponse({'success': False, 'error': 'Payment method is required'})
+
+            # Calculate total amount (in cents)
+            total_in_cents = int(order.amount * 100)
+
+            # Create PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=total_in_cents,
+                currency='nzd',
+                payment_method=payment_method_id,
+                confirm=True,
+            )
+
+            if intent.status == 'succeeded':
+                order.payment_status = 'Paid'
+                order.save()
+                return redirect('order_confirmation')  # Redirect to an order confirmation page
+            else:
+                return JsonResponse({'success': False, 'error': 'Payment failed'})
+
+        except stripe.error.StripeError as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+
+
+
+
+class PaymentView(View):
+    def get(self, *args, **kwargs):
+        order_id = kwargs.get('oid')
+        try:
+            order = Order.objects.get(order_id=order_id)
+            context = {
+                'order': order,
+            }
+            return render(self.request, "payment.html", context)
+        except Order.DoesNotExist:
+            messages.error(self.request, "The requested order does not exist.")
+            raise Http404("Order not found")
+
+    def post(self, *args, **kwargs):
+        order_id = kwargs.get('oid')
+        try:
+            order = Order.objects.get(customuser=self.request.user, order_id=order_id)
+            stripe_token = self.request.POST.get('stripeToken')
+            amount_in_cents = order.amount * 100  # Convert to cents
+            
+            try:
+                intent = stripe.PaymentIntent.create(
+                    amount=amount_in_cents,
+                    currency="nzd",
+                    payment_method=stripe_token,
+                    confirm=True,
+                )
+
+                # Handle successful payment
+                if intent.status == 'succeeded':
+                    payment = Payment()
+                    payment.stripe_charge_id = intent.id
+                    payment.user = self.request.user
+                    payment.amount = order.amount
+                    payment.save()
+
+                    order.payment = payment
+                    order.save()
+
+                    messages.success(self.request, "Order was successful")
+                    return redirect('/confirmorder/' + str(order.order_id))
+
+                else:
+                    messages.error(self.request, "Payment failed.")
+                    return redirect("/home/")
+
+            except stripe.error.StripeError as e:
+                messages.error(self.request, f"Stripe error: {e.error.message}")
+                return redirect("/home/")
+
+            except Exception as e:
+                messages.error(self.request, f"An error occurred: {str(e)}")
+                return redirect("/home/")
+
+        except Order.DoesNotExist:
+            messages.error(self.request, "The requested order does not exist.")
+            return redirect("/home/")
+        
+

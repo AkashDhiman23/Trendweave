@@ -8,9 +8,9 @@ from django.contrib.auth.hashers import make_password, check_password
 
 
 class CustomUser(models.Model):
-    customuser_id = models.CharField(max_length=10, unique=True, primary_key=True)  # 4-digit unique ID as primary key
+    customuser_id = models.CharField(max_length=10, unique=True, primary_key=True) 
     first_name = models.CharField(max_length=30)  # First name field
-    last_name = models.CharField(max_length=30)   # Last name field
+    last_name = models.CharField(max_length=30)   
     email = models.EmailField(unique=True)
     password = models.CharField(max_length=128)  # Password field for hashed password
 
@@ -45,6 +45,10 @@ class Cart(models.Model):
         return f"Cart item {self.cart_item_id}: {self.customuser.customuser_id} - {self.product.name} x{self.quantity}"
     
 
+ 
+    def sub_total(self):
+        return self.product.price * self.quantity
+
 
 class Wish(models.Model):
     cid = models.AutoField(primary_key=True)  # Wishlist ID
@@ -61,3 +65,49 @@ class Wish(models.Model):
 
 
 
+class Order(models.Model):
+    STATUS_CHOICES = (
+        ("PENDING", "Pending"),
+        ("CONFIRM", "Confirm"),
+        ("ON_SHIPPING", "On Shipping"),
+        ("CANCEL", "Cancel"),
+        ("DELIVERED", "Delivered"),
+    )
+
+    order_id = models.AutoField(primary_key=True)
+    customuser = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='orders')
+    name = models.CharField(max_length=30)
+    email = models.EmailField(max_length=30)
+    phone = models.BigIntegerField()
+    address = models.TextField(max_length=100)
+    city = models.CharField(max_length=30)
+    state = models.CharField(max_length=30)
+    zip = models.CharField(max_length=10)
+    amount = models.IntegerField()
+    p_type = models.CharField(max_length=30)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="PENDING")
+    odate = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Order {self.order_id} - {self.name}"
+
+
+class OrderItem(models.Model):
+    orderitem_id = models.AutoField(primary_key=True)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_items')
+    quantity = models.IntegerField()
+    sub_total = models.IntegerField()
+
+    def __str__(self):
+        return f"Order Item {self.orderitem_id} for Order {self.order.order_id}"
+
+
+class Payment(models.Model):
+    stripe_charge_id = models.CharField(max_length=50, primary_key=True)
+    customuser = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, blank=True, null=True, related_name='payments')
+    amount = models.IntegerField()  # Use IntegerField to store amount in cents
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Payment by {self.customuser.first_name if self.customuser else 'Unknown User'}"

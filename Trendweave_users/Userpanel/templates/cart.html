@@ -36,13 +36,38 @@
     color: white !important;
 }
 
+.checkout-btn {
+    background-color: #000 !important;
+    color: #fff !important;
+}
 
-    </style>
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.quantity-controls .btn {
+    padding: 0.1rem;
+    font-size: 1.25rem;
+    width: 35px;
+    border-color: #000;
+    background-color: none;
+    height: 35px;
+
+}
+
+.quantity-controls input {
+    width: 60px;
+    text-align: center;
+    font-size: 1.25rem;
+    padding: 0.1rem;
+}
+
+</style>
  
 
- {% include 'navbar.html' %}
-
-
+ {% include 'authnavbar.html' %}
 
 <!-- Breadcrumb Start -->
 <div class="container-fluid">
@@ -76,46 +101,32 @@
           </tr>
         </thead>
         <tbody class="align-middle">
+         
           {% for d in data %}
-          <tr>
-            <td class="align-middle">
-              <img src="{{d.p_id.pimg.url}}" alt="" style="width: 50px" />
-              {{d.p_id.pname}}
-            </td>
-            <td class="align-middle">${{d.p_id.pprice}}</td>
-            <td class="align-middle">
-              <div class="input-group quantity mx-auto" style="width: 100px">
-                <div class="input-group-btn">
-                  <a
-                    href="/minus-cart/{{d.cid}}/"
-                    class="btn btn-sm btn-primary btn-minus"
-                  >
-                    <i class="fa fa-minus"></i>
-                  </a>
-                </div>
-                <input
-                  type="text"
-                  class="form-control form-control-sm bg-secondary border-0 text-center"
-                  value="{{d.quantity}}"
-                />
-                <div class="input-group-btn">
-                  <a
-                    href="/plus-cart/{{d.cid}}/"
-                    class="btn btn-sm btn-primary btn-plus"
-                  >
-                    <i class="fa fa-plus"></i>
-                  </a>
-                </div>
-              </div>
-            </td>
-            <td class="align-middle">${{d.sub_total}}</td>
-            <td class="align-middle">
-              <a href="/delete-cart/{{d.cid}}/" class="btn btn-sm btn-danger"
-                ><i class="fa fa-times"></i
-              ></a>
-            </td>
-          </tr>
-          {% endfor %}
+<tr>
+    <td class="align-middle">
+        <img src="{{ d.product.pimg.url }}" alt="" style="width: 50px" />
+        {{ d.product.name }}
+    </td>
+    <td class="align-middle">${{ d.product.price }}</td>
+    <td class="align-middle">
+        <div class="quantity-controls mx-auto">
+            <a href="/minus-cart/{{ d.cart_item_id }}/" class="btn btn-sm  btn-minus">
+                <i class="fa fa-minus"></i>
+            </a>
+            <input type="text" class="form-control form-control-sm bg-secondary border-0 text-center" value="{{ d.quantity }}" />
+            <a href="/plus-cart/{{ d.cart_item_id }}/" class="btn btn-sm  btn-plus">
+                <i class="fa fa-plus"></i>
+            </a>
+        </div>
+    </td>
+    <td class="align-middle">${{ d.sub_total }}</td>
+    <td class="align-middle">
+        <a href="/delete-cart/{{ d.cart_item_id }}/" class="btn btn-sm btn-danger"><i class="fa fa-times"></i></a>
+    </td>
+</tr>
+{% endfor %}
+
         </tbody>
       </table>
     </div>
@@ -130,10 +141,10 @@
             <h5>Total</h5>
             <h5>${{g_total}}</h5>
           </div>
-          <button class="btn btn-block btn-primary font-weight-bold my-3 py-3">
+          <button class="btn btn-block checkout-btn font-weight-bold my-3 py-3">
             <a
               href="/checkout/"
-              class="btn btn-block btn-primary ont-weight-bold"
+              class="btn btn-block checkout-btn ont-weight-bold"
             >
               Proceed To Checkout
             </a>
@@ -148,5 +159,9 @@
 {% endif %}
 <!-- Cart End -->
 
+
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

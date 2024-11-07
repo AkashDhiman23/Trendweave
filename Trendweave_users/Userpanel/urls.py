@@ -19,8 +19,14 @@ urlpatterns = [
     path('profile/', views.profile, name='profile'),
     path('wish/add/<int:pid>/', views.add_wish, name='add_wish'),
     path('filter-products/', views.filter_products, name='filter_products'),
-   
-   
+    path('home/', views.home, name='home'),
+    path('plus-cart/<int:cart_item_id>/',views.plus_cart,name='plus_cart'),
+    path('minus-cart/<int:cart_item_id>/',views.minus_cart,name='minus_cart'),
+    path('delete-cart/<int:cart_item_id>/',views.delete_cart,name='delete_cart'),
+    path('myorders/',views.myorders,name='myorders'),
+    path('confirmorder/<int:order_id>',views.confirmorder,name='confirmorder'),
+    path('payment/stripe/<int:oid>/', views.PaymentView.as_view(), name='payment'),
+
    
 ]
 if settings.DEBUG:

@@ -34,7 +34,12 @@
 <body>
       
     <!-- Topbar Start -->
-    {% include 'navbar.html' %}
+    
+
+ {% include 'authnavbar.html' %}
+
+
+
 
 
 <!-- Breadcrumb Start -->
@@ -147,7 +152,7 @@
               <h6 class="mb-3">Products</h6>
               {% for d in data %}
               <div class="d-flex justify-content-between">
-                <p>{{d.p_id.pname}}</p>
+                <p>{{d.product.name}}</p>
                 <p>${{d.sub_total}}</p>
               </div>
               {% endfor %}

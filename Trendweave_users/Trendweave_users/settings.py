@@ -97,6 +97,10 @@ WSGI_APPLICATION = 'Trendweave_users.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
+# Database
+# https://docs.djangoproject.com/en/5.0/ref/settings/#databases
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
@@ -167,6 +171,9 @@ EMAIL_HOST_USER = 'trendweavenz@outlook.com'
 EMAIL_HOST_PASSWORD = 'trendweave@123'  
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-LOGIN_URL = '/Userpanel/login/'
+LOGIN_URL = '/login/'
+
+STRIPE_TEST_PUBLIC_KEY = 'pk_test_51PJPlI098w1868DgStq59Ol9oGjPuVzf9Gi8w1aSa3UFFPU4gtKoum5KPA2DymTGWGHDh1p6Hb1JoIrVUb3CsBV700mRl7AgzB'
+STRIPE_TEST_SECRET_KEY = 'sk_test_51PJPlI098w1868Dgc6pSzhp7ESO87GRpL89KmZVlHl6TdRLtaeRokRO5RkJPOmS7oCsCddTlPP3SGqjFAez52rs300lxnlV9Lg'
 
 
