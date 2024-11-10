@@ -1,10 +1,11 @@
-from django.http import HttpResponse, JsonResponse # type: ignore
-from django.shortcuts import get_object_or_404, render, redirect# type: ignore
-from .forms import AdminRegisterForm# type: ignore
-from django.contrib.auth import authenticate, login,logout # type: ignore
-from django.contrib import messages # type: ignore
-from .models import AdminRegister,Category, Subcategory, Product# type: ignore
-from django.utils.text import slugify # type: ignore
+from django.http import HttpResponse, JsonResponse 
+from django.shortcuts import get_object_or_404, render, redirect
+from .forms import AdminRegisterForm
+from django.contrib.auth import authenticate, login,logout 
+from django.contrib import messages 
+from .models import AdminRegister,Category, Subcategory, Product
+from django.utils.text import slugify 
+
 
 
 def index(request):
@@ -35,6 +36,7 @@ def index(request):
 
     return render(request, 'index.html')
 
+
 def registration_view(request):
 
     if request.method == 'POST':
@@ -57,22 +59,29 @@ def logout_view(request):
 
 def dashboard(request):
     # Check if the admin is logged in
+    from Userpanel.models import Order,OrderItem,CustomUser
     if 'admin_id' in request.session:
         # Fetch counts from the database
         product_count = Product.objects.count()
         category_count = Category.objects.count()
         subcategory_count = Subcategory.objects.count()
-        
+
+       
+    user_count = CustomUser.objects.count()  # Adjust this if you're using a custom user model
+    order_count = Order.objects.count()  # Adjust this if you have an Order model
+
+  
         # Prepare context data to send to the template
-        context = {
+    context = {
             'product_count': product_count,
             'category_count': category_count,
             'subcategory_count': subcategory_count,
-        }
+            'user_count': user_count,
+        'order_count': order_count,
+    }
         
-        return render(request, 'dashboard.html', context)
-    else:
-        return redirect('index') 
+    return render(request, 'dashboard.html', context)
+
 
 
 def edit_product(request):
@@ -86,9 +95,9 @@ def edit_product(request):
         product.description = request.POST.get('description')
         product.price = request.POST.get('price')
         product.stock = request.POST.get('stock')
-        product.size = request.POST.get('size')  # Update size attribute
+        product.size = request.POST.get('size')  
         product.category_id = request.POST.get('category')
-        product.subcategory_id = request.POST.get('subcategory') or None  # Set to None if no subcategory is selected
+        product.subcategory_id = request.POST.get('subcategory') or None 
 
         # Handle image uploads if necessary
         if 'image_1' in request.FILES:
@@ -146,10 +155,6 @@ def profile_view(request):
     }
 
     return render(request, 'profile.html', context)
-
-
-def category_view(request):
-    return render(request, 'category.html')
 
 
 def category_view(request):
@@ -224,12 +229,17 @@ def add_subcategory(request):
 
 
 
-
 def subcategory_view(request):
     # categories = Category.objects.all()
     categories = Category.objects.all()
     return render(request, 'subcateogory.html', {'categories': categories})
 
+
+def user_view(request):
+    from Userpanel.models import CustomUser
+    # categories = Category.objects.all()
+    CustomUser = CustomUser.objects.all()
+    return render(request, 'user.html', {'CustomUser': CustomUser})
 
 
 
@@ -361,7 +371,6 @@ def edit_category(request):
 
 
 
-
 def edit_subcategory(request):
     if request.method == 'POST':
         subcategory_id = request.POST.get('subcategory_id')
@@ -381,6 +390,7 @@ def edit_subcategory(request):
 
     return redirect('subcategory_view')  # Redirect if not a POST request
 
+
 def delete_subcategory(request):
     if request.method == 'POST':
         subcategory_id = request.POST.get('subcategory_id')
@@ -390,14 +400,14 @@ def delete_subcategory(request):
         subcategory.delete()
 
         messages.success(request, 'Subcategory deleted successfully!')
-        return redirect('subcategory_view')  # Redirect to your subcategory list view
+        return redirect('subcategory_view') 
 
-    return redirect('subcategory_view')  # Redirect if not a POST request
+    return redirect('subcategory_view')  
 
 
 
 def delete_category(request, category_id):
-    # Change `id=category_id` to `category_id=category_id`
+  
     category = get_object_or_404(Category, category_id=category_id)
     
     if request.method == "POST":
@@ -413,16 +423,53 @@ def delete_category(request, category_id):
 
 
 
+def order_view(request):
+    from Userpanel.models import Order,OrderItem
+    # Product=Product.objects.all()
+    OrderItem=OrderItem.objects.all()
+    Order = Order.objects.all()
+
+    return render(request, 'order.html', {'Order': Order})
+
+
+
+def update_order_status(request):
+    from Userpanel.models import Order
+    if request.method == "POST":
+        order_id = request.POST.get('order_id')
+        new_status = request.POST.get('status')
+
+        print(f"Received order_id: {order_id}")
+        print(f"Received new_status: {new_status}")
+
+        # Check if order_id is valid
+        if not order_id or not order_id.isdigit():
+            return HttpResponse("Invalid order ID", status=400)
+
+        order_id = int(order_id)  # Ensure it is converted to an integer
+
+        # Get the order object
+        order = get_object_or_404(Order, pk=order_id)
+        order.status = new_status
+        order.save()
+        return redirect('order_view')
+
+
+
+
 
 
 def delete_product(request, product_id):
-    # Change `id=product_id` to `product_id=product_id`
+ 
     product = get_object_or_404(Product, product_id=product_id)
 
     if request.method == "POST":
-        product_name = product.name  # Capture the product name before deleting
+        product_name = product.name 
         product.delete()
         messages.success(request, f'Product "{product_name}" was deleted successfully.')
-        return redirect('product')  # Redirect to the product management page
+        return redirect('product') 
 
     return render(request, 'product.html', {'products': Product.objects.all()})
+
+
+

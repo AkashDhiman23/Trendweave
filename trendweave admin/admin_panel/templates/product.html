@@ -172,10 +172,9 @@
                     <li><a href="{% url 'subcategory_view' %}">Subcategories</a></li>
                 </ul>
             </li>
-            <li><a href="#"><i class="bi bi-cart"></i>Orders</a></li>
-            <li><a href="#"><i class="bi bi-person"></i>Users</a></li>
-            <li><a href="#"><i class="bi bi-file-earmark-bar-graph"></i>Reports</a></li>
-            <li><a href="#"><i class="bi bi-gear"></i>Settings</a></li>
+            <li><a href="{% url 'order_view' %}"><i class="bi bi-cart"></i>Orders</a></li>
+            <li><a href="{% url 'user_view' %}"><i class="bi bi-person"></i>Users</a></li>
+         
             <li><a href="{% url 'logout' %}"><i class="bi bi-door-open"></i>Logout</a></li>
         </ul>
     </div>
@@ -229,11 +228,11 @@
                             <td>{{ product.stock }}</td>
                             <td>
                                 <div class="d-flex justify-content-center"> 
-                                <button class="btn btn-warning btn-sm">Edit</button>
+                                <button class="btn btn-warning btn-sm" style="margin:5px;">Edit</button>
                                 {% if product.product_id %}
                                         <form action="{% url 'delete_product' product.product_id %}" method="post">
                                             {% csrf_token %}
-                                            <button type="submit" class="btn btn-black">Delete</button>
+                                            <button type="submit" class="btn btn-black" style="margin:5px;">Delete</button>
                                         </form>
                                         {% else %}
                                         <p>Cannot delete this category.</p>

@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=D:\cloud computin projects\trendweave admin\venv
+set VIRTUAL_ENV=D:\cloud computin projects\Trend_weave\Trendweave\trendweave admin\venv
 
 if not defined PROMPT set PROMPT=$P$G
 

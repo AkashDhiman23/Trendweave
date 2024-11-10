@@ -26,6 +26,7 @@ urlpatterns = [
     path('myorders/',views.myorders,name='myorders'),
     path('confirmorder/<int:order_id>',views.confirmorder,name='confirmorder'),
     path('payment/stripe/<int:oid>/', views.PaymentView.as_view(), name='payment'),
+    path('order-cancel/<int:order_id>',views.order_cancel,name='order_cancel'),
 
    
 ]

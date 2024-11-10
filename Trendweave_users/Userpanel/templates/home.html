@@ -253,7 +253,7 @@
           <div class="d-flex align-items-center justify-content-center mt-2">
             <h5>${{ product.price }}</h5>
           </div>
-          <a href="#" class="btn mt-3" style="background-color: black; color: white;">View Detail</a>
+          <a href="{% url 'product' product.product_id %}" class="btn mt-3" style="background-color: black; color: white;">View Detail</a>
         </div>
       </div>
     </div>

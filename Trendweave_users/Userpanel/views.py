@@ -15,6 +15,7 @@ from django.contrib.auth.models import User,auth
 from .forms import CustomUserForm , LoginForm # Ensure you have a form class for user registration
 from django.http import JsonResponse
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
 
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
@@ -141,20 +142,33 @@ def search(request):
     return render(request, 'search.html', {'data': data, 'query': query})
 
 
+from django.shortcuts import render
+from admin_panel.models import Category, Subcategory, Product
+
 def shop(request):
-    from admin_panel.models import Category, Subcategory, Product  # Move import here
+    from admin_panel.models import Category, Subcategory, Product  
     products = Product.objects.all()
     categories = Category.objects.all()
     subcategories = Subcategory.objects.all()
+    
+    # Calculate the count of products within each price range
+    price_ranges = {
+        '0_100': products.filter(price__gte=0, price__lt=100).count(),
+        '100_200': products.filter(price__gte=100, price__lt=200).count(),
+        '200_300': products.filter(price__gte=200, price__lt=300).count(),
+        '300_400': products.filter(price__gte=300, price__lt=400).count(),
+        '400_500': products.filter(price__gte=400, price__lt=500).count(),
+    }
     
     context = {
         'products': products,
         'categories': categories,
         'subcategories': subcategories,
+        'products_count': products.count(),
+        'price_ranges': price_ranges,
     }
     
     return render(request, 'shop.html', context)
-
 
 
 def product(request, product_id):
@@ -240,27 +254,14 @@ def add_wish(request, pid):
 
     return redirect('/wish/')
 
-@login_required(login_url='/login/')
+
 def profile(request):
-    # Fetch the logged-in admin's ID from the session
-    user_id = request.session.get('user_id')
-
-    if not user_id:
-        return redirect('index')  # Redirect to login if no admin is logged in
-
-    try:
-        # Get the logged-in admin's data
-        customUser = CustomUser.objects.get(customuser_id=user_id)
-    except CustomUser.DoesNotExist:
-        return redirect('index')  # Handle case where admin does not exist
-
-    # Pass the admin's data to the template
+    # Pass the user's data to the template
     context = {
-        'customUser': customUser  # Use 'customUser' instead of 'user'
+        'customUser': request.user
     }
 
     return render(request, 'myprofile.html', context)
-
 
 
 def filter_products(request):
@@ -483,3 +484,9 @@ class PaymentView(View):
             return redirect("/home/")
         
 
+
+def order_cancel(request,order_id):
+    order_data = Order.objects.get(order_id=order_id)
+    order_data.status = 'CANCEL'
+    order_data.save()
+    return redirect('/myorders/')

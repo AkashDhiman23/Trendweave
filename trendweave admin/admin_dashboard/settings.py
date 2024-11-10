@@ -41,7 +41,8 @@ INSTALLED_APPS = [
 
     # Custom apps
   
-      'admin_panel',
+    'admin_panel',
+    'Userpanel'
     
 ]
 
