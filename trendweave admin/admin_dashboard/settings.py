@@ -46,12 +46,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-    # Custom apps
-  
-    'admin_panel',
-    'Userpanel'
     
+    # Custom apps
+    'admin_panel',
+    'Userpanel',  # Ensure this is present
 ]
 
 MIDDLEWARE = [
@@ -90,15 +88,15 @@ WSGI_APPLICATION = 'admin_dashboard.wsgi.application'
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
-            'default': {
-                'ENGINE':'django.db.backends.postgresql_psycopg2',
-                'NAME': os.environ['RDS_DB_NAME'],
-                'USER': os.environ['RDS_USERNAME'],
-                'PASSWORD': os.environ['RDS_PASSWORD'],
-                'HOST': os.environ['RDS_HOSTNAME'],
-                'PORT': os.environ['RDS_PORT'],
-            }
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': os.environ['RDS_DB_NAME'],
+            'USER': os.environ['RDS_USERNAME'],
+            'PASSWORD': os.environ['RDS_PASSWORD'],
+            'HOST': os.environ['RDS_HOSTNAME'],
+            'PORT': os.environ['RDS_PORT'],
         }
+    }
 else:
     DATABASES = {
         'default': {
