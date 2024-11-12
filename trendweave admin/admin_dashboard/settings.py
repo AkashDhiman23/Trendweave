@@ -79,18 +79,43 @@ WSGI_APPLICATION = 'admin_dashboard.wsgi.application'
 
 
 # Database
+# https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+if 'RDS_DB_NAME' in os.environ:
+    DATABASES = {
+            'default': {
+                'ENGINE':'django.db.backends.postgresql_psycopg2',
+                'NAME': os.environ['RDS_DB_NAME'],
+                'USER': os.environ['RDS_USERNAME'],
+                'PASSWORD': os.environ['RDS_PASSWORD'],
+                'HOST': os.environ['RDS_HOSTNAME'],
+                'PORT': os.environ['RDS_PORT'],
+            }
+        }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            'NAME': 'Trendweavedb',
+            'USER': 'postgres',
+            'PASSWORD': 'dhiman223',#'This is the password for your local postgres pgadmin'
+            'HOST': '', #'Localhost is empty'
+            'PORT':'', #Assumes default as 5432
+        },
+    }
+
+# Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'Trendweavedb',        
-        'USER': 'postgres',         
-        'PASSWORD': 'dhiman223', 
-        'HOST': 'localhost',            
-        'PORT': '5432',                 
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': 'Trendweavedb',        
+#         'USER': 'postgres',         
+#         'PASSWORD': 'dhiman223', 
+#         'HOST': 'localhost',            
+#         'PORT': '5432',                 
+#     }
+# }
 
 
 # Password validation
