@@ -26,7 +26,15 @@ SECRET_KEY = 'django-insecure-ek5-bygdg*#c9uw2oog2_d!6=yyiz-%z^kc78_t7kfk*o*iiyj
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+if 'PYTHONPATH' in os.environ:
+    Debug = True
+    # Debug = False
+    ALLOWED_HOSTS = ['.ap-southeast-2.elasticbeanstalk.com']
+else:
+    # SECURITY WARNING: don't run with debug turned on in production!
+    DEBUG = True
+    ALLOWED_HOSTS = []
+
 
 
 # Application definition
@@ -148,8 +156,31 @@ USE_I18N = True
 
 USE_TZ = True
 
-# settings.py
-STATIC_URL = '/static/'
+if 'S3_BUCKET' in os.environ:
+    STATICFILES_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    
+    AWS_S3_ACCESS_KEY_ID = os.environ['AWS_ACCESS_KEY_ID']
+    AWS_S3_SECRET_ACCESS_KEY = os.environ['AWS_SECRET_ACCESS_KEY']
+
+    AWS_STORAGE_BUCKET_NAME = os.environ['S3_BUCKET']
+    AWS_S3_REGION_NAME = os.environ['AWS_S3_REGION_NAME']
+
+    AWS_DEFAULT_ACL = None
+
+    AWS_S3_CUSTOM_DOMAIN = '%s.s3.amazonaws.com' % AWS_STORAGE_BUCKET_NAME
+    AWS_S3_OBJECT_PARAMETERS = {
+       'CacheControl': 'max-age=86400',
+    }
+    AWS_S3_FILE_OVERWRITE = False
+    #AWS_DEFAULT_ACL = 'public-read'
+    AWS_DEFAULT_ACL = None
+
+    AWS_LOCATION = 'static'
+    STATIC_URL = 'https://%s/%s/' % (AWS_S3_CUSTOM_DOMAIN, AWS_LOCATION)    
+
+else:
+    STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'admin_panel/static',  
 ]
