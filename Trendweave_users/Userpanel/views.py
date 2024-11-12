@@ -323,55 +323,92 @@ def checkout(request):
         zip = request.POST['zip']
         payment = request.POST['payment']
 
-        # Handle Cash on Delivery
+        # Define the order type
         if payment == '1':  # Cash on Delivery
             order_type = 'Cash On Delivery'
-            order = Order(
-                name=name, email=email, phone=phone, address=address,
-                city=city, state=state, zip=zip, p_type=order_type,
-                customuser=request.user, amount=total
-            )
-            order.save()
-
-            # Create OrderItems for each product in the cart
-            for d in data:
-                p = Product.objects.get(product_id=d.product.product_id)  # Correctly access the product
-                order_item = OrderItem(
-                    order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
-                )
-                order_item.save()
-
-                # Delete the cart item after adding it to the order
-                d.delete()
-
-            messages.success(request, 'Order is saved...')
-            return redirect('/confirmorder/' + str(order.order_id))
-
         else:  # Stripe payment
             order_type = 'Stripe'
-            order = Order(
-                name=name, email=email, phone=phone, address=address,
-                city=city, state=state, zip=zip, p_type=order_type,
-                customuser=request.user, amount=total
+
+        # Create the order
+        order = Order(
+            name=name, email=email, phone=phone, address=address,
+            city=city, state=state, zip=zip, p_type=order_type,
+            customuser=request.user, amount=total
+        )
+        order.save()
+
+        # Create OrderItems and update product quantities
+        for d in data:
+            # Access the product and update quantity
+            p = Product.objects.get(product_id=d.product.product_id)
+            order_item = OrderItem(
+                order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
             )
-            order.save()
+            order_item.save()
 
-            # Create OrderItems for each product in the cart
-            for d in data:
-                p = Product.objects.get(product_id=d.product.product_id)  # Correctly access the product
-                order_item = OrderItem(
-                    order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
-                )
-                order_item.save()
+            # Reduce the product quantity in stock
+            p.stock -= d.quantity
+            p.save()
 
-                # Delete the cart item after adding it to the order
-                d.delete()
+            # Delete the cart item after adding it to the order
+            d.delete()
 
-            # Redirect to the Stripe payment page
+        # Confirm order based on payment method
+        if payment == '1':  # Cash on Delivery
+            messages.success(request, 'Order is saved...')
+            return redirect('/confirmorder/' + str(order.order_id))
+        else:  # Stripe payment
             return redirect('/payment/stripe/' + str(order.order_id) + '/')
 
     # Render the checkout page with the cart data
     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
+
+
+
+
+def myorders(request):
+    data = Order.objects.filter(customuser=request.user)
+    return render(request,'myorder.html',{'data':data})
+
+def confirmorder(request, order_id):
+    order_data = Order.objects.get(order_id=order_id)
+    order_item_data = OrderItem.objects.filter(order=order_data)  # Filter by the order instance
+
+    return render(request, 'confirmorder.html', {'order_data': order_data, 'order_item_data': order_item_data})
+
+
+def process_payment(request, order_id):
+    order = Order.objects.get(id=order_id)
+    
+    if request.method == 'POST':
+        try:
+            payment_method_id = request.POST['payment_method_id']
+            
+            if not payment_method_id:
+                return JsonResponse({'success': False, 'error': 'Payment method is required'})
+
+            # Calculate total amount (in cents)
+            total_in_cents = int(order.amount * 100)
+
+            # Create PaymentIntent
+            intent = stripe.PaymentIntent.create(
+                amount=total_in_cents,
+                currency='nzd',
+                payment_method=payment_method_id,
+                confirm=True,
+            )
+
+            if intent.status == 'succeeded':
+                order.payment_status = 'Paid'
+                order.save()
+                return redirect('order_confirmation')  # Redirect to an order confirmation page
+            else:
+                return JsonResponse({'success': False, 'error': 'Payment failed'})
+
+        except stripe.error.StripeError as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
 

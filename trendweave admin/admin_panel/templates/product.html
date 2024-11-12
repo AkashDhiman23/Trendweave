@@ -345,7 +345,7 @@
                 <h5 class="modal-title" id="editProductModalLabel">Edit Product</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form method="POST" action="{% url 'edit_product' %}" enctype="multipart/form-data" id="editProductForm">
+            <form method="POST" action="{% url 'edit_product' %}" id="editProductForm">
                 {% csrf_token %}
                 <div class="modal-body">
                     <input type="hidden" id="edit_product_id" name="product_id" required>
@@ -371,41 +371,9 @@
                             <label for="edit_stock" class="form-label">Quantity <span class="text-danger">*</span></label>
                             <input type="number" class="form-control" id="edit_stock" name="stock" required>
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="edit_categorySelect" class="form-label">Select Category <span class="text-danger">*</span></label>
-                        <select class="form-select" id="edit_categorySelect" name="category" required>
-                            <option value="" disabled>Select a category</option>
-                            {% for category in categories %}
-                            <option value="{{ category.pk }}">{{ category.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label for="edit_subcategorySelect" class="form-label">Select Subcategory <span class="text-danger">*</span></label>
-                        <select class="form-select" id="edit_subcategorySelect" name="subcategory" required>
-                            <option value="" disabled>Select a subcategory</option>
-                            {% for subcategory in subcategories %}
-                                <option value="{{ subcategory.pk }}">{{ subcategory.name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-
-                    <!-- Image Uploads -->
-                    <div class="row">
-                        <div class="col-md-4 mb-3">
-                            <label for="edit_image_1" class="form-label">Product Image 1</label>
-                            <input type="file" class="form-control" id="edit_image_1" name="image_1" accept="image/*">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="edit_image_2" class="form-label">Product Image 2</label>
-                            <input type="file" class="form-control" id="edit_image_2" name="image_2" accept="image/*">
-                        </div>
-                        <div class="col-md-4 mb-3">
-                            <label for="edit_image_3" class="form-label">Product Image 3</label>
-                            <input type="file" class="form-control" id="edit_image_3" name="image_3" accept="image/*">
+                        <div class="col-md-6">
+                            <label for="size" class="form-label">Size <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="size" name="size" required>
                         </div>
                     </div>
                 </div>
@@ -427,8 +395,7 @@
         document.getElementById('edit_description').value = product.description;
         document.getElementById('edit_price').value = product.price;
         document.getElementById('edit_stock').value = product.stock;
-        document.getElementById('edit_categorySelect').value = product.category.id;
-        document.getElementById('edit_subcategorySelect').value = product.subcategory.id;
+     
 
         // Show the modal
         var editModal = new bootstrap.Modal(document.getElementById('editProductModal'));

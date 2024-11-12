@@ -96,22 +96,14 @@ def edit_product(request):
         product.price = request.POST.get('price')
         product.stock = request.POST.get('stock')
         product.size = request.POST.get('size')  
-        product.category_id = request.POST.get('category')
-        product.subcategory_id = request.POST.get('subcategory') or None 
-
-        # Handle image uploads if necessary
-        if 'image_1' in request.FILES:
-            product.image_1 = request.FILES['image_1']
-        if 'image_2' in request.FILES:
-            product.image_2 = request.FILES['image_2']
-        if 'image_3' in request.FILES:
-            product.image_3 = request.FILES['image_3']
+       
+      
 
         # Save the updated product details to the database
         product.save()
 
-        # Redirect to the product list page (replace 'product_list' with your actual view name)
-        return redirect('product_list')
+        
+        return redirect('product')
 
     elif request.method == "GET":
         # Retrieve product ID from the query parameters
