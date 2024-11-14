@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     
     # Custom apps
+    'admin_dashboard',
     'admin_panel',
     'Userpanel',  # Ensure this is present
 ]
