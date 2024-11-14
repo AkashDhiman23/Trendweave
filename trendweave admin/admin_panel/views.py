@@ -157,38 +157,34 @@ def category_view(request):
 
 def add_category(request):
     if request.method == 'POST':
-        # Get the category name and description from the form data
         category_name = request.POST.get('category_name')
         category_description = request.POST.get('category_description')
 
-        # Check if the category name is provided
         if not category_name:
             return JsonResponse({'status': 'error', 'message': 'Category name is required.'})
 
-        # Generate the slug from the category name
         category_slug = slugify(category_name)
 
-        # Get the admin instance using the admin_id from the session
         admin_id = request.session.get('admin_id')
+        if not admin_id:
+            return JsonResponse({'status': 'error', 'message': 'No admin ID found in session.'})
+
         try:
             admin = AdminRegister.objects.get(admin_id=admin_id)
         except AdminRegister.DoesNotExist:
             return JsonResponse({'status': 'error', 'message': 'Admin not found.'})
 
-        # Create and save the new category instance with the admin instance
         category = Category(
             name=category_name,
             slug=category_slug,
             description=category_description,
-            admin_id=admin  # Assign the AdminRegister instance here
+            admin_id=admin
         )
         category.save()
 
-        # Redirect to the category list or another appropriate view
-        return render(request, 'category.html')
+        return render(request, 'category.html', {'status': 'success', 'message': 'Category added successfully.'})
 
     return render(request, 'category.html')
-
 
 
 def add_subcategory(request):

@@ -408,53 +408,6 @@ def process_payment(request, order_id):
         except stripe.error.StripeError as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
-    return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-
-
-
-def myorders(request):
-    data = Order.objects.filter(customuser=request.user)
-    return render(request,'myorder.html',{'data':data})
-
-def confirmorder(request, order_id):
-    order_data = Order.objects.get(order_id=order_id)
-    order_item_data = OrderItem.objects.filter(order=order_data)  # Filter by the order instance
-
-    return render(request, 'confirmorder.html', {'order_data': order_data, 'order_item_data': order_item_data})
-
-
-def process_payment(request, order_id):
-    order = Order.objects.get(id=order_id)
-    
-    if request.method == 'POST':
-        try:
-            payment_method_id = request.POST['payment_method_id']
-            
-            if not payment_method_id:
-                return JsonResponse({'success': False, 'error': 'Payment method is required'})
-
-            # Calculate total amount (in cents)
-            total_in_cents = int(order.amount * 100)
-
-            # Create PaymentIntent
-            intent = stripe.PaymentIntent.create(
-                amount=total_in_cents,
-                currency='nzd',
-                payment_method=payment_method_id,
-                confirm=True,
-            )
-
-            if intent.status == 'succeeded':
-                order.payment_status = 'Paid'
-                order.save()
-                return redirect('order_confirmation')  # Redirect to an order confirmation page
-            else:
-                return JsonResponse({'success': False, 'error': 'Payment failed'})
-
-        except stripe.error.StripeError as e:
-            return JsonResponse({'success': False, 'error': str(e)})
-
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
