@@ -7,6 +7,8 @@ from django.core.mail import send_mail # type: ignore
 from django.contrib.auth.decorators import login_required
 from django.views import View
 import stripe
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_decode
 from .models import CustomUser ,Wish, Cart ,Order,OrderItem,Payment
 from django.contrib.auth import authenticate, login 
 from django.shortcuts import render, redirect
@@ -16,6 +18,8 @@ from .forms import CustomUserForm , LoginForm # Ensure you have a form class for
 from django.http import JsonResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+import logging
+from django.template.loader import render_to_string
 
 stripe.api_key = settings.STRIPE_TEST_SECRET_KEY
 
@@ -66,6 +70,66 @@ def register(request):
             messages.error(request, 'Please fill in all fields.')
 
     return render(request, 'registeration.html') 
+
+
+
+def forgot_password(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        try:
+            user = CustomUser.objects.get(email=email)
+            # Send password reset email
+            user.reset_password()
+            messages.success(request, "A password reset link has been sent to your email.")
+            return redirect('login')
+        except ObjectDoesNotExist:
+            messages.error(request, "Email not found.")
+            return redirect('forgot_password')
+
+    return render(request, 'forgetpassword.html')
+
+
+
+
+
+def reset_password(request, uidb64, token):
+    try:
+        uid = urlsafe_base64_decode(uidb64).decode()
+        user = CustomUser.objects.get(pk=uid)
+
+        if default_token_generator.check_token(user, token):
+            if request.method == 'POST':
+                new_password1 = request.POST.get('new_password1')
+                new_password2 = request.POST.get('new_password2')
+
+                if new_password1 == new_password2:
+                    user.set_password(new_password1)
+                    user.save()
+                    messages.success(request, "Your password has been reset successfully.")
+                    return redirect('login')
+                else:
+                    messages.error(request, "Passwords do not match.")
+            return render(request, 'reset_password.html')
+
+        else:
+            messages.error(request, "The password reset link is invalid or expired.")
+            return redirect('login')
+
+    except User.DoesNotExist:
+        messages.error(request, "Invalid user.")
+        return redirect('login')
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -300,17 +364,17 @@ def home(request):
     return render(request, 'home.html', context)
 
 
-
+# Create a logger for debugging
+logger = logging.getLogger(__name__)
 
 def checkout(request):
-    from admin_panel.models import Category, Subcategory, Product
     data = Cart.objects.filter(customuser=request.user)
     g_total = 0
     for d in data:
         g_total += d.sub_total()
 
     total = g_total + 10  # Fixed shipping fee
-    total_in_cents = total * 100  # Convert to cents for Stripe payment
+    total_in_cents = int(round(total * 100))
 
     if request.method == 'POST':
         # Get POST data from the form
@@ -323,45 +387,165 @@ def checkout(request):
         zip = request.POST['zip']
         payment = request.POST['payment']
 
-        # Define the order type
         if payment == '1':  # Cash on Delivery
             order_type = 'Cash On Delivery'
-        else:  # Stripe payment
-            order_type = 'Stripe'
-
-        # Create the order
-        order = Order(
-            name=name, email=email, phone=phone, address=address,
-            city=city, state=state, zip=zip, p_type=order_type,
-            customuser=request.user, amount=total
-        )
-        order.save()
-
-        # Create OrderItems and update product quantities
-        for d in data:
-            # Access the product and update quantity
-            p = Product.objects.get(product_id=d.product.product_id)
-            order_item = OrderItem(
-                order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+            # Create the order
+            order = Order(
+                name=name, email=email, phone=phone, address=address,
+                city=city, state=state, zip=zip, p_type=order_type,
+                customuser=request.user, amount=total
             )
-            order_item.save()
+            order.save()
 
-            # Reduce the product quantity in stock
-            p.stock -= d.quantity
-            p.save()
+            # Create OrderItems and update product quantities
+            for d in data:
+                p = Product.objects.get(product_id=d.product.product_id)
+                order_item = OrderItem(
+                    order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+                )
+                order_item.save()
 
-            # Delete the cart item after adding it to the order
-            d.delete()
+                # Reduce the product quantity in stock
+                p.stock -= d.quantity
+                p.save()
 
-        # Confirm order based on payment method
-        if payment == '1':  # Cash on Delivery
+                # Delete the cart item after adding it to the order
+                d.delete()
+
+            # Send confirmation email
+            send_invoice_email(order)
+
             messages.success(request, 'Order is saved...')
             return redirect('/confirmorder/' + str(order.order_id))
-        else:  # Stripe payment
-            return redirect('/payment/stripe/' + str(order.order_id) + '/')
 
-    # Render the checkout page with the cart data
+        elif payment == '2':  # Stripe payment
+            order_type = 'Stripe'
+            order = Order(
+                name=name, email=email, phone=phone, address=address,
+                city=city, state=state, zip=zip, p_type=order_type,
+                customuser=request.user, amount=total
+            )
+            order.save()
+
+            try:
+                stripe_charge = stripe.Charge.create(
+                    amount=total_in_cents,
+                    currency='usd',
+                    description='Fashion Store Checkout',
+                    source=request.POST['stripeToken']
+                )
+
+                payment = Payment(
+                    stripe_charge_id=stripe_charge['id'],
+                    customuser=request.user,
+                    amount=total_in_cents
+                )
+                payment.save()
+
+                for d in data:
+                    p = Product.objects.get(product_id=d.product.product_id)
+                    order_item = OrderItem(
+                        order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+                    )
+                    order_item.save()
+
+                    p.stock -= d.quantity
+                    p.save()
+                    d.delete()
+
+                # Send confirmation email
+                send_invoice_email(order)
+
+                messages.success(request, 'Order placed successfully with Stripe payment!')
+                return redirect('/confirmorder/' + str(order.order_id))
+            except stripe.error.StripeError as e:
+                logger.error(f"Stripe error: {str(e)}")
+                messages.error(request, 'Error processing payment: ' + str(e))
+                return redirect('/checkout/')
+
     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
+
+
+def send_invoice_email(order):
+    subject = f"Order Confirmation - #{order.order_id}"
+    message = render_to_string('invoice_email.html', {
+        'order': order,
+        'order_items': OrderItem.objects.filter(order=order),
+        'total': order.amount,
+    })
+    send_mail(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [order.email],
+        fail_silently=False,
+    )
+
+
+
+
+
+
+# def checkout(request):
+#     from admin_panel.models import Category, Subcategory, Product
+#     data = Cart.objects.filter(customuser=request.user)
+#     g_total = 0
+#     for d in data:
+#         g_total += d.sub_total()
+
+#     total = g_total + 10  # Fixed shipping fee
+#     total_in_cents = total * 100  # Convert to cents for Stripe payment
+
+#     if request.method == 'POST':
+#         # Get POST data from the form
+#         name = request.POST['name']
+#         email = request.POST['email']
+#         phone = request.POST['phone']
+#         address = request.POST['address']
+#         city = request.POST['city']
+#         state = request.POST['state']
+#         zip = request.POST['zip']
+#         payment = request.POST['payment']
+
+#         # Define the order type
+#         if payment == '1':  # Cash on Delivery
+#             order_type = 'Cash On Delivery'
+#         else:  # Stripe payment
+#             order_type = 'Stripe'
+
+#         # Create the order
+#         order = Order(
+#             name=name, email=email, phone=phone, address=address,
+#             city=city, state=state, zip=zip, p_type=order_type,
+#             customuser=request.user, amount=total
+#         )
+#         order.save()
+
+#         # Create OrderItems and update product quantities
+#         for d in data:
+#             # Access the product and update quantity
+#             p = Product.objects.get(product_id=d.product.product_id)
+#             order_item = OrderItem(
+#                 order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
+#             )
+#             order_item.save()
+
+#             # Reduce the product quantity in stock
+#             p.stock -= d.quantity
+#             p.save()
+
+#             # Delete the cart item after adding it to the order
+#             d.delete()
+
+#         # Confirm order based on payment method
+#         if payment == '1':  # Cash on Delivery
+#             messages.success(request, 'Order is saved...')
+#             return redirect('/confirmorder/' + str(order.order_id))
+#         else:  # Stripe payment
+#             return redirect('/payment/stripe/' + str(order.order_id) + '/')
+
+#     # Render the checkout page with the cart data
+#     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
 
 
 

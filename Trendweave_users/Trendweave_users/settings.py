@@ -167,9 +167,8 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.office365.com'  # For Office 365
 EMAIL_PORT = 587  # Use 587 for TLS
 EMAIL_USE_TLS = True  # Set to True for TLS
-EMAIL_HOST_USER = 'trendweavenz@outlook.com'  
-EMAIL_HOST_PASSWORD = 'trendweave@123'  
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = 'trendweavesales@outlook.com'  
+EMAIL_HOST_PASSWORD = 'pbkcjvqvevhuzqjr'  
 
 LOGIN_URL = '/login/'
 

@@ -27,6 +27,9 @@ urlpatterns = [
     path('confirmorder/<int:order_id>',views.confirmorder,name='confirmorder'),
     path('payment/stripe/<int:oid>/', views.PaymentView.as_view(), name='payment'),
     path('order-cancel/<int:order_id>',views.order_cancel,name='order_cancel'),
+    path('forgot-password/', views.forgot_password, name='forgot_password'), 
+    path('reset-password/<uidb64>/<token>/', views.reset_password, name='reset-password'),
+    
 
    
 ]
