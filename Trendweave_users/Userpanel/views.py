@@ -379,23 +379,31 @@ def confirmorder(request, order_id):
 
 def process_payment(request, order_id):
     order = Order.objects.get(id=order_id)
-    
+
     if request.method == 'POST':
         try:
-            payment_method_id = request.POST['payment_method_id']
-            
-            if not payment_method_id:
+            payment_token = request.POST.get('stripeToken')  # Get the token from the form
+
+            if not payment_token:
                 return JsonResponse({'success': False, 'error': 'Payment method is required'})
 
             # Calculate total amount (in cents)
             total_in_cents = int(order.amount * 100)
 
-            # Create PaymentIntent
+            # Create a PaymentIntent using the token
             intent = stripe.PaymentIntent.create(
-                amount=total_in_cents,
-                currency='nzd',
-                payment_method=payment_method_id,
-                confirm=True,
+                amount=total_in_cents,  # Amount in cents
+                currency='nzd',  # Currency in New Zealand Dollars
+                payment_method_data={  # Correct way to pass payment_method_data
+                    'type': 'card',
+                    'card': {
+                        'token': payment_token  # Pass the token here
+                    }
+                },  # Pass the token directly
+                confirm=True,  # Automatically confirm the PaymentIntent
+                automatic_payment_methods={  
+                    'enabled': True,  # Enable automatic payment methods selection
+                },
             )
 
             if intent.status == 'succeeded':
@@ -409,11 +417,6 @@ def process_payment(request, order_id):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-
-
-
-
 
 class PaymentView(View):
     def get(self, *args, **kwargs):
