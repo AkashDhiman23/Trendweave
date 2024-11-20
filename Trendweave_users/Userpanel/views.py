@@ -1,3 +1,4 @@
+import email
 from urllib import request
 from django.http import Http404
 from django.shortcuts import redirect
@@ -73,20 +74,7 @@ def register(request):
 
 
 
-def forgot_password(request):
-    if request.method == 'POST':
-        email = request.POST.get('email')
-        try:
-            user = CustomUser.objects.get(email=email)
-            # Send password reset email
-            user.reset_password()
-            messages.success(request, "A password reset link has been sent to your email.")
-            return redirect('login')
-        except ObjectDoesNotExist:
-            messages.error(request, "Email not found.")
-            return redirect('forgot_password')
 
-    return render(request, 'forgetpassword.html')
 
 
 
@@ -242,6 +230,34 @@ def product(request, product_id):
         'product': product
     }
     return render(request, 'product.html', context)
+
+
+
+
+def shop_o(request):
+    from admin_panel.models import Category, Subcategory, Product  
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    subcategories = Subcategory.objects.all()
+    
+    # Calculate the count of products within each price range
+    price_ranges = {
+        '0_100': products.filter(price__gte=0, price__lt=100).count(),
+        '100_200': products.filter(price__gte=100, price__lt=200).count(),
+        '200_300': products.filter(price__gte=200, price__lt=300).count(),
+        '300_400': products.filter(price__gte=300, price__lt=400).count(),
+        '400_500': products.filter(price__gte=400, price__lt=500).count(),
+    }
+    
+    context = {
+        'products': products,
+        'categories': categories,
+        'subcategories': subcategories,
+        'products_count': products.count(),
+        'price_ranges': price_ranges,
+    }
+    
+    return render(request, 'shop-o.html', context)
 
 
 
@@ -466,86 +482,96 @@ def checkout(request):
     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
 
 
+
+
+# def send_invoice_email(order):
+#     subject = f"Order Confirmation - #{order.order_id}"
+#     message = render_to_string('invoice_email.html', {
+#         'order': order,
+#         'order_items': OrderItem.objects.filter(order=order),
+#         'total': order.amount,
+#     })
+#     send_mail(
+#         subject,
+#         message,
+#         settings.DEFAULT_FROM_EMAIL,
+#         [order.email],
+#         fail_silently=False,
+#     )
+
+
+from io import BytesIO
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
+from django.template.loader import render_to_string
+
+
+# Function to generate the PDF invoice
+def generate_invoice_pdf(order):
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.setTitle(f"Order #{order.order_id} Invoice")
+
+    # Header
+    pdf.drawString(30, 750, f"Order Confirmation - #{order.order_id}")
+    pdf.drawString(30, 730, f"Customer: {order.name}")
+    pdf.drawString(30, 710, f"Email: {order.email}")
+    pdf.drawString(30, 690, f"Order Total: ${order.amount}")
+    pdf.drawString(30, 670, "Items:")
+
+    # Add items to the PDF
+    y_position = 650
+    order_items = OrderItem.objects.filter(order=order)
+    for item in order_items:
+        pdf.drawString(30, y_position, f"{item.product.name} - Quantity: {item.quantity} ")
+        y_position -= 20
+
+    pdf.showPage()
+    pdf.save()
+
+    buffer.seek(0)
+    return buffer
+
+# Function to send the invoice email
 def send_invoice_email(order):
+    # Generate the PDF invoice
+    pdf_buffer = generate_invoice_pdf(order)
+
+    # Email subject and body content
     subject = f"Order Confirmation - #{order.order_id}"
     message = render_to_string('invoice_email.html', {
         'order': order,
         'order_items': OrderItem.objects.filter(order=order),
         'total': order.amount,
     })
+
+    # Send the email with the PDF attached
     send_mail(
         subject,
         message,
         settings.DEFAULT_FROM_EMAIL,
         [order.email],
         fail_silently=False,
+        html_message=message,
     )
 
+    # Attach the generated PDF (send_mail does not support attachments, so we need a workaround)
+    from django.core.mail import EmailMessage
+    email = EmailMessage(
+        subject,
+        message,
+        settings.DEFAULT_FROM_EMAIL,
+        [order.email],
+    )
+    email.content_subtype = 'html'
+    email.attach(f"Order_{order.order_id}_Invoice.pdf", pdf_buffer.getvalue(), 'application/pdf')
+    
+    # Send the email with attachment
+    email.send(fail_silently=False)
 
-
-
-
-
-# def checkout(request):
-#     from admin_panel.models import Category, Subcategory, Product
-#     data = Cart.objects.filter(customuser=request.user)
-#     g_total = 0
-#     for d in data:
-#         g_total += d.sub_total()
-
-#     total = g_total + 10  # Fixed shipping fee
-#     total_in_cents = total * 100  # Convert to cents for Stripe payment
-
-#     if request.method == 'POST':
-#         # Get POST data from the form
-#         name = request.POST['name']
-#         email = request.POST['email']
-#         phone = request.POST['phone']
-#         address = request.POST['address']
-#         city = request.POST['city']
-#         state = request.POST['state']
-#         zip = request.POST['zip']
-#         payment = request.POST['payment']
-
-#         # Define the order type
-#         if payment == '1':  # Cash on Delivery
-#             order_type = 'Cash On Delivery'
-#         else:  # Stripe payment
-#             order_type = 'Stripe'
-
-#         # Create the order
-#         order = Order(
-#             name=name, email=email, phone=phone, address=address,
-#             city=city, state=state, zip=zip, p_type=order_type,
-#             customuser=request.user, amount=total
-#         )
-#         order.save()
-
-#         # Create OrderItems and update product quantities
-#         for d in data:
-#             # Access the product and update quantity
-#             p = Product.objects.get(product_id=d.product.product_id)
-#             order_item = OrderItem(
-#                 order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
-#             )
-#             order_item.save()
-
-#             # Reduce the product quantity in stock
-#             p.stock -= d.quantity
-#             p.save()
-
-#             # Delete the cart item after adding it to the order
-#             d.delete()
-
-#         # Confirm order based on payment method
-#         if payment == '1':  # Cash on Delivery
-#             messages.success(request, 'Order is saved...')
-#             return redirect('/confirmorder/' + str(order.order_id))
-#         else:  # Stripe payment
-#             return redirect('/payment/stripe/' + str(order.order_id) + '/')
-
-#     # Render the checkout page with the cart data
-#     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
+    # Close the PDF buffer
+    pdf_buffer.close()
 
 
 
@@ -557,6 +583,9 @@ def myorders(request):
 def confirmorder(request, order_id):
     order_data = Order.objects.get(order_id=order_id)
     order_item_data = OrderItem.objects.filter(order=order_data)  # Filter by the order instance
+
+        # Check if the data exists
+    print(order_item_data)  # Add this line to inspect the output in the console.
 
     return render(request, 'confirmorder.html', {'order_data': order_data, 'order_item_data': order_item_data})
 
@@ -667,3 +696,99 @@ def order_cancel(request,order_id):
     order_data.status = 'CANCEL'
     order_data.save()
     return redirect('/myorders/')
+
+
+
+from .forms import PasswordResetRequestForm
+from django.utils.crypto import get_random_string
+
+otp_store = {}
+
+def password_reset(request):
+    if request.method == 'POST':
+        form = PasswordResetRequestForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            try:
+                user = CustomUser.objects.get(email=email)
+                # Generate a random OTP
+                otp = get_random_string(length=6, allowed_chars='0123456789')
+                
+                # Store email and OTP in the session
+                request.session['email'] = email
+                request.session['otp'] = otp
+                
+                # Send OTP to email
+                send_mail(
+                    'Your OTP for Password Reset',
+                    f'Your OTP for resetting your password is: {otp}',
+                    'admin@fashionstore.com',  # Replace with your email
+                    [email],
+                    fail_silently=False,
+                )
+                messages.success(request, 'OTP sent to your email.')
+                return redirect('verify_and_reset')
+            except CustomUser.DoesNotExist:  # Update to use your custom user model
+                messages.error(request, 'No account found with this email.')
+        else:
+            messages.error(request, 'Invalid email address.')
+    else:
+        form = PasswordResetRequestForm()
+    return render(request, 'forgetpassword.html', {'form': form})
+
+
+
+
+from django.contrib.auth import get_user_model
+
+from django.contrib.auth import get_user_model
+
+def verify_and_reset(request):
+    if request.method == "POST":
+        # Fetch the data from the POST request
+        entered_otp = request.POST.get('otp')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+
+        # Retrieve email and OTP from the session
+        email = request.session.get('email')
+        stored_otp = request.session.get('otp')
+
+        # Debugging: Print to verify session values
+        print(f"Email from session: {email}")
+        print(f"OTP from session: {stored_otp}")
+
+        # Check OTP validity
+        if entered_otp == stored_otp:  # Verify OTP
+            if new_password1 == new_password2:  # Ensure passwords match
+                if email:  # Check if email exists in the session
+                    try:
+                        # Fetch the user from the database using the email
+                        user = get_user_model().objects.get(email=email)
+
+                        # Set the new password and save the user object
+                        user.set_password(new_password1)
+                        user.save()
+
+                        # Clear session data after successful reset
+                        del request.session['email']
+                        del request.session['otp']
+
+                        # Success message and redirect to login
+                        messages.success(request, "Your password has been reset successfully.")
+                        return redirect('login')  # Redirect to the login page after password reset
+
+                    except get_user_model().DoesNotExist:
+                        # Handle case where the user is not found
+                        messages.error(request, "User not found. Please check the email address.")
+                        return redirect('password_reset')  # Redirect back to password reset
+
+                else:
+                    messages.error(request, "No email found in session.")
+            else:
+                messages.error(request, "Passwords do not match. Please try again.")
+        else:
+            messages.error(request, "Invalid OTP. Please try again.")
+
+    return render(request, 'password_reset_verify.html')
+

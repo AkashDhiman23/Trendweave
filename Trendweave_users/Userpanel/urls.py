@@ -27,11 +27,13 @@ urlpatterns = [
     path('confirmorder/<int:order_id>',views.confirmorder,name='confirmorder'),
     path('payment/stripe/<int:oid>/', views.PaymentView.as_view(), name='payment'),
     path('order-cancel/<int:order_id>',views.order_cancel,name='order_cancel'),
-    path('forgot-password/', views.forgot_password, name='forgot_password'), 
-    path('reset-password/<uidb64>/<token>/', views.reset_password, name='reset-password'),
-    
-
+ 
+    path('shop_o/', views.shop_o, name='shop_o'),
+    path('password_reset/', views.password_reset, name='password_reset'),  # Step 1: Email input
    
+    path('password_reset/verify_and_reset/', views.verify_and_reset, name='verify_and_reset'),  # Step 2: OTP verification + reset password
 ]
+   
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

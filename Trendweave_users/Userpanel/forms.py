@@ -26,3 +26,10 @@ class CustomUserForm(forms.ModelForm):
 class LoginForm(forms.Form):
     email = forms.EmailField(max_length=255, required=True)
     password = forms.CharField(widget=forms.PasswordInput, required=True)
+
+
+
+from django import forms
+
+class PasswordResetRequestForm(forms.Form):
+    email = forms.EmailField()

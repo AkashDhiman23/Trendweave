@@ -164,11 +164,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.office365.com'  # For Office 365
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587  # Use 587 for TLS
 EMAIL_USE_TLS = True  # Set to True for TLS
-EMAIL_HOST_USER = 'trendweavesales@outlook.com'  
-EMAIL_HOST_PASSWORD = 'pbkcjvqvevhuzqjr'  
+EMAIL_HOST_USER = 'trendweave77@gmail.com'  
+EMAIL_HOST_PASSWORD = 'xsalpshdvapczttp'  
 
 LOGIN_URL = '/login/'
 
