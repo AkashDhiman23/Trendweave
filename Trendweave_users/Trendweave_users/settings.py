@@ -43,6 +43,10 @@ else:
 
 
 # Application definition
+AUTHENTICATION_BACKENDS = [
+    'Userpanel.auth_backends.CustomUserBackend',  
+    'django.contrib.auth.backends.ModelBackend',  # Keep the default backend if needed
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
