@@ -1,11 +1,11 @@
 branch-defaults:
   default:
-    environment: Trendweave-users2-dev
+    environment: Trendweave-users-dev
     group_suffix: null
 global:
-  application_name: Trendweave_users2
+  application_name: Trendweave_users
   branch: null
-  default_ec2_keyname: userpanel
+  default_ec2_keyname: aws-key-pair
   default_platform: Python 3.9 running on 64bit Amazon Linux 2023
   default_region: ap-southeast-2
   include_git_submodules: true
