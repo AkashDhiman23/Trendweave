@@ -53,7 +53,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'admin_panel',  # Make sure this is included
     'Userpanel',
-    'Trendweave_users'
     
 ]
 
