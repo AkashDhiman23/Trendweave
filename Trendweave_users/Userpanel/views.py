@@ -40,7 +40,7 @@ def login(request):
             # Log the user in
             auth.login(request, user)
             messages.success(request, 'Successfully logged in.')
-            return redirect('/shop_o/')
+            return redirect('/shop/')
         else:
             messages.warning(request, 'Invalid credentials. Please try again.')
             return redirect('/login/')
@@ -279,7 +279,7 @@ def add_cart(request, product_id):
         cart_item.save()
         message = 'Product quantity updated in your cart.'
 
-    return redirect('shop_o')
+    return redirect('shop')
 
 
 
@@ -575,69 +575,6 @@ def send_invoice_email(order):
 
 
 
-# def checkout(request):
-#     from admin_panel.models import Category, Subcategory, Product
-#     data = Cart.objects.filter(customuser=request.user)
-#     g_total = 0
-#     for d in data:
-#         g_total += d.sub_total()
-
-#     total = g_total + 10  # Fixed shipping fee
-#     total_in_cents = total * 100  # Convert to cents for Stripe payment
-
-#     if request.method == 'POST':
-#         # Get POST data from the form
-#         name = request.POST['name']
-#         email = request.POST['email']
-#         phone = request.POST['phone']
-#         address = request.POST['address']
-#         city = request.POST['city']
-#         state = request.POST['state']
-#         zip = request.POST['zip']
-#         payment = request.POST['payment']
-
-#         # Define the order type
-#         if payment == '1':  # Cash on Delivery
-#             order_type = 'Cash On Delivery'
-#         else:  # Stripe payment
-#             order_type = 'Stripe'
-
-#         # Create the order
-#         order = Order(
-#             name=name, email=email, phone=phone, address=address,
-#             city=city, state=state, zip=zip, p_type=order_type,
-#             customuser=request.user, amount=total
-#         )
-#         order.save()
-
-#         # Create OrderItems and update product quantities
-#         for d in data:
-#             # Access the product and update quantity
-#             p = Product.objects.get(product_id=d.product.product_id)
-#             order_item = OrderItem(
-#                 order=order, product=p, quantity=d.quantity, sub_total=d.sub_total()
-#             )
-#             order_item.save()
-
-#             # Reduce the product quantity in stock
-#             p.stock -= d.quantity
-#             p.save()
-
-#             # Delete the cart item after adding it to the order
-#             d.delete()
-
-#         # Confirm order based on payment method
-#         if payment == '1':  # Cash on Delivery
-#             messages.success(request, 'Order is saved...')
-#             return redirect('/confirmorder/' + str(order.order_id))
-#         else:  # Stripe payment
-#             return redirect('/payment/stripe/' + str(order.order_id) + '/')
-
-#     # Render the checkout page with the cart data
-#     return render(request, 'checkout.html', {'data': data, 'g_total': g_total, 'total': total})
-
-
-
 
 def myorders(request):
     data = Order.objects.filter(customuser=request.user)
@@ -776,9 +713,11 @@ def password_reset(request):
                 user = CustomUser.objects.get(email=email)
                 # Generate a random OTP
                 otp = get_random_string(length=6, allowed_chars='0123456789')
-                # Store OTP and email in session
+                
+                # Store email and OTP in the session
                 request.session['email'] = email
                 request.session['otp'] = otp
+                
                 # Send OTP to email
                 send_mail(
                     'Your OTP for Password Reset',
@@ -789,7 +728,7 @@ def password_reset(request):
                 )
                 messages.success(request, 'OTP sent to your email.')
                 return redirect('verify_and_reset')
-            except CustomUser.DoesNotExist:
+            except CustomUser.DoesNotExist:  # Update to use your custom user model
                 messages.error(request, 'No account found with this email.')
         else:
             messages.error(request, 'Invalid email address.')
@@ -801,57 +740,55 @@ def password_reset(request):
 
 
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
+
+from django.contrib.auth import get_user_model
 
 def verify_and_reset(request):
     if request.method == "POST":
+        # Fetch the data from the POST request
         entered_otp = request.POST.get('otp')
         new_password1 = request.POST.get('new_password1')
         new_password2 = request.POST.get('new_password2')
 
+        # Retrieve email and OTP from the session
         email = request.session.get('email')
-        otp = request.session.get('otp')
+        stored_otp = request.session.get('otp')
 
-        print(f"Session Email: {email}")
-        print(f"Session OTP: {otp}")
-        print(f"Entered OTP: {entered_otp}")
+        # Debugging: Print to verify session values
+        print(f"Email from session: {email}")
+        print(f"OTP from session: {stored_otp}")
 
-        if not email or not otp:
-            messages.error(request, "Session expired or invalid. Please restart the process.")
-            return redirect('password_reset')
-
-        if entered_otp == str(otp):  # Check if OTP matches
-            if new_password1 == new_password2:  # Check if passwords match
-                try:
-                    user = get_user_model().objects.get(email=email)
-                    print(f"User Found: {user.email}")
-
-                    # Validate the new password
+        # Check OTP validity
+        if entered_otp == stored_otp:  # Verify OTP
+            if new_password1 == new_password2:  # Ensure passwords match
+                if email:  # Check if email exists in the session
                     try:
-                        validate_password(new_password1, user)
-                    except ValidationError as e:
-                        messages.error(request, f"Password validation error: {'; '.join(e.messages)}")
-                        return redirect('verify_and_reset')
+                        # Fetch the user from the database using the email
+                        user = get_user_model().objects.get(email=email)
 
-                    # Update the password
-                    user.set_password(new_password1)
-                    print("Password has been set.")
-                    user.save()
-                    print("Password successfully updated!")
+                        # Set the new password and save the user object
+                        user.set_password(new_password1)
+                        user.save()
 
-                    messages.success(request, "Your password has been reset successfully.")
-                    return redirect('login')
+                        # Clear session data after successful reset
+                        del request.session['email']
+                        del request.session['otp']
 
-                except get_user_model().DoesNotExist:
-                    print("User not found")
-                    messages.error(request, "User not found. Please check the email address.")
-                    return redirect('password_reset')
+                        # Success message and redirect to login
+                        messages.success(request, "Your password has been reset successfully.")
+                        return redirect('login')  # Redirect to the login page after password reset
+
+                    except get_user_model().DoesNotExist:
+                        # Handle case where the user is not found
+                        messages.error(request, "User not found. Please check the email address.")
+                        return redirect('password_reset')  # Redirect back to password reset
+
+                else:
+                    messages.error(request, "No email found in session.")
             else:
                 messages.error(request, "Passwords do not match. Please try again.")
         else:
             messages.error(request, "Invalid OTP. Please try again.")
 
     return render(request, 'password_reset_verify.html')
-
 

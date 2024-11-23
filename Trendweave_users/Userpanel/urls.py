@@ -28,7 +28,7 @@ urlpatterns = [
     path('payment/stripe/<int:oid>/', views.PaymentView.as_view(), name='payment'),
     path('order-cancel/<int:order_id>',views.order_cancel,name='order_cancel'),
  
-     path('shop_o/', views.shop_o, name='shop_o'),
+    path('shop_o/', views.shop_o, name='shop_o'),
     path('password_reset/', views.password_reset, name='password_reset'),  # Step 1: Email input
    
     path('password_reset/verify_and_reset/', views.verify_and_reset, name='verify_and_reset'),  # Step 2: OTP verification + reset password

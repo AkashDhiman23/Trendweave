@@ -3,105 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Invoice</title>
+    <title>Order Confirmation</title>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f8f9fa;
-            margin: 0;
-            padding: 0;
+            font-family: Arial, sans-serif;
         }
         .container {
-            max-width: 800px;
-            margin: 20px auto;
-            background-color: #fff;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
-            overflow: hidden;
-            padding: 20px;
+            margin-top: 20px;
         }
-        .header {
-            text-align: center;
-            padding: 10px 0;
-            border-bottom: 2px solid #007bff;
+        .card {
+            border: 1px solid #007bff;
+            border-radius: 10px;
         }
-        .header img {
-            max-width: 150px;
-        }
-        .header h1 {
-            margin: 10px 0 0;
-            font-size: 24px;
-            color: #333;
-        }
-        .order-info {
-            margin: 20px 0;
-        }
-        .order-info p {
-            margin: 5px 0;
-            color: #555;
-        }
-        .list-group {
-            padding: 0;
-            margin: 20px 0;
-            list-style: none;
+        .card-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
         }
         .list-group-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 15px;
-            border-bottom: 1px solid #ddd;
-        }
-        .list-group-item:last-child {
-            border-bottom: none;
         }
         .total {
             text-align: right;
             font-size: 1.2em;
             font-weight: bold;
             color: #28a745;
-            margin-top: 15px;
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #666;
         }
     </style>
 </head>
 <body>
-    {% load static %}
     <div class="container">
-        <!-- Header Section -->
-        <div class="header">
-            <img src="{% static 'userpanel/img/LOGO.png' %}" alt="Company Logo">
-            <h1>Invoice</h1>
-        </div>
-
-        <!-- Order Info Section -->
-        <div class="order-info">
-            <p><strong>Order ID:</strong> {{ order.order_id }}</p>
-            <p><strong>Customer Name:</strong> {{ order.name }}</p>
-            <p><strong>Order Date:</strong> {{ order.odate.date }}</p>
-        </div>
-
-        <!-- Items List Section -->
-        <ul class="list-group">
-            {% for item in order_items %}
-            <li class="list-group-item">
-                <span>{{ item.product.name }} (Qty: {{ item.quantity }})</span>
-                <span>${{ item.sub_total }}</span>
-            </li>
-            {% endfor %}
-        </ul>
-
-        <!-- Total Amount Section -->
-        <p class="total">Total: ${{ total }}</p>
-
-        <!-- Footer Section -->
-        <div class="footer">
-            <p>Thank you for shopping with us!</p>
-            <p>We hope to serve you again soon.</p>
+        <div class="card">
+            <div class="card-header">
+                <h2>Order Confirmation - Order #{{ order.order_id }}</h2>
+            </div>
+            <div class="card-body">
+                <p><strong>Thank you for your order, {{ order.name }}!</strong></p>
+                <p>Here are your order details:</p>
+                <ul class="list-group">
+                    {% for item in order_items %}
+                        <li class="list-group-item">
+                            <span>{{ item.product.name }} -Quantity: {{ item.quantity }}</span>
+                            <span>${{ item.sub_total }}</span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <p class="total">Total: ${{ total }}</p>
+                <p>We hope to see you again soon!</p>
+            </div>
         </div>
     </div>
 </body>
