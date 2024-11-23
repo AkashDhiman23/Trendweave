@@ -40,7 +40,7 @@ def login(request):
             # Log the user in
             auth.login(request, user)
             messages.success(request, 'Successfully logged in.')
-            return redirect('/shop/')
+            return redirect('/shop_o/')
         else:
             messages.warning(request, 'Invalid credentials. Please try again.')
             return redirect('/login/')
@@ -279,7 +279,7 @@ def add_cart(request, product_id):
         cart_item.save()
         message = 'Product quantity updated in your cart.'
 
-    return redirect('shop')
+    return redirect('shop_o')
 
 
 
